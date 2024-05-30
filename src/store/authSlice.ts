@@ -6,8 +6,8 @@ type AuthStateType = {
 };
 
 const authInitialState: AuthStateType = {
-  user: sessionStorage.getItem("user")
-    ? JSON.parse(sessionStorage.getItem("user") as string)
+  user: localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user") as string)
     : null,
 };
 
@@ -17,11 +17,11 @@ export const authSlice = createSlice({
   reducers: {
     LOGIN: (state, action) => {
       state.user = action.payload;
-      sessionStorage.setItem("user", JSON.stringify(action.payload));
+      localStorage.setItem("user", JSON.stringify(action.payload));
     },
     LOGOUT: (state) => {
       state.user = null;
-      sessionStorage.removeItem("user");
+      localStorage.removeItem("user");
     },
   },
 });
