@@ -1,10 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle.ts";
 import React, { useState } from "react";
-import { loginService } from "../../services";
+import { loginService, profileService } from "../../services";
 import { useAppDispatch } from "../../hooks";
-import { LOGIN } from "../../store/authSlice.ts";
+import { LOGIN, PROFILE } from "../../store/authSlice.ts";
 import DOMPurify from "dompurify";
+import { UserInterface } from "../../interfaces";
 
 export const Login = () => {
   const [formData, setFormData] = useState({
@@ -55,10 +56,14 @@ export const Login = () => {
       password: DOMPurify.sanitize(formData.get("password") as string),
     };
 
-    const data = await loginService(authDetail);
+    const data = (await loginService(authDetail)) as UserInterface;
 
     if (data) {
       dispatch(LOGIN(data));
+
+      const profileData = await profileService(data.id);
+
+      dispatch(PROFILE(profileData));
 
       navigate("/");
     }

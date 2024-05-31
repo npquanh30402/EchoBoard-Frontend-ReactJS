@@ -1,13 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserInterface } from "../interfaces/UserInterface.ts";
+import { ProfileInterface, UserInterface } from "../interfaces";
 
 type AuthStateType = {
   user: UserInterface | null;
+  profile?: ProfileInterface | null;
 };
 
 const authInitialState: AuthStateType = {
   user: localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user") as string)
+    : null,
+  profile: localStorage.getItem("profile")
+    ? JSON.parse(localStorage.getItem("profile") as string)
     : null,
 };
 
@@ -21,11 +25,17 @@ export const authSlice = createSlice({
     },
     LOGOUT: (state) => {
       state.user = null;
+      state.profile = null;
       localStorage.removeItem("user");
+      localStorage.removeItem("profile");
+    },
+    PROFILE: (state, action) => {
+      state.profile = action.payload;
+      localStorage.setItem("profile", JSON.stringify(action.payload));
     },
   },
 });
 
-export const { LOGIN, LOGOUT } = authSlice.actions;
+export const { LOGIN, LOGOUT, PROFILE } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;

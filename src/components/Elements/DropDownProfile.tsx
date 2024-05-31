@@ -1,9 +1,14 @@
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { LOGOUT } from "../../store/authSlice.ts";
+import avatarBackup from "/public/assets/images/avatar_backup.jpg";
 
 export const DropDownProfile = () => {
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, profile } = useAppSelector((state) => state.auth);
+
+  const profileImage =
+    import.meta.env.VITE_SERVER_URL + "/" + profile?.profilePictureUrl;
+
   const dispatch = useAppDispatch();
   return (
     <>
@@ -16,7 +21,7 @@ export const DropDownProfile = () => {
           <div className="w-10 rounded-full">
             <img
               alt="Tailwind CSS Navbar component"
-              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+              src={profile?.profilePictureUrl ? profileImage : avatarBackup}
             />
           </div>
         </div>
