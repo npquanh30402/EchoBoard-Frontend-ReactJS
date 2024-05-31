@@ -1,8 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useDocumentTitle } from "../../hooks/useDocumentTitle.ts";
+import { useAppDispatch, useDocumentTitle } from "../../hooks";
 import React, { useState } from "react";
 import { loginService, profileService } from "../../services";
-import { useAppDispatch } from "../../hooks";
 import { LOGIN, PROFILE } from "../../store/authSlice.ts";
 import DOMPurify from "dompurify";
 import { UserInterface } from "../../interfaces";

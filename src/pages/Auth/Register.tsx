@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDocumentTitle } from "../../hooks/useDocumentTitle.ts";
+import { useDocumentTitle } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import { registerService } from "../../services";
 import DOMPurify from "dompurify";

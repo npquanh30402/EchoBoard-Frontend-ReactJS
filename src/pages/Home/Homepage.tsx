@@ -1,6 +1,5 @@
-import { useDocumentTitle } from "../../hooks/useDocumentTitle.ts";
+import { useDocumentTitle } from "../../hooks";
 
 export const Homepage = () => {
   useDocumentTitle("Homepage");
-  return <>Homepage</>;
 };
