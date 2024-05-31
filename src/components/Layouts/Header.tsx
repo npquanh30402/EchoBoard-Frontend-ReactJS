@@ -1,5 +1,4 @@
-import { DropDownProfile } from "../Elements/DropDownProfile.tsx";
-import { DropdownNavbar } from "../Elements/DropdownNavbar.tsx";
+import { DropdownNavbar, DropDownProfile } from "../Elements";
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 

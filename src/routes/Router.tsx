@@ -1,8 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App.tsx";
-import { Homepage } from "../pages/Home/Homepage.tsx";
-import { Register } from "../pages/Auth/Register.tsx";
-import { Login } from "../pages/Auth/Login.tsx";
+import { AdminPage, Homepage, Login, PageNotFound, Register } from "../pages";
+import { AdminProtectedRoute } from "./AdminProtectedRoute.tsx";
 
 export const Router = createBrowserRouter([
   {
@@ -23,6 +22,18 @@ export const Router = createBrowserRouter([
       {
         path: "/forgot-password",
         element: <Homepage />,
+      },
+      {
+        path: "/admin",
+        element: (
+          <AdminProtectedRoute>
+            <AdminPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: "/*",
+        element: <PageNotFound />,
       },
     ],
   },
