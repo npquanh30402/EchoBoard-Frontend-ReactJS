@@ -2,14 +2,19 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App.tsx";
 import {
   AdminPage,
+  AllFriends,
   ConversationPage,
+  FriendPage,
+  FriendRequest,
   Homepage,
   Login,
   PageNotFound,
   Register,
+  SentRequest,
 } from "../pages";
 import { AdminProtectedRoute } from "./AdminProtectedRoute.tsx";
 import { RouteEnum } from "../enums";
+import { AuthProtectedRoute } from "./AuthProtectedRoute.tsx";
 
 export const Router = createBrowserRouter([
   {
@@ -30,6 +35,28 @@ export const Router = createBrowserRouter([
       {
         path: RouteEnum.FORGOT_PASSWORD,
         element: <Homepage />,
+      },
+      {
+        path: RouteEnum.FRIEND,
+        element: (
+          <AuthProtectedRoute>
+            <FriendPage />
+          </AuthProtectedRoute>
+        ),
+        children: [
+          {
+            path: RouteEnum.All_FRIEND,
+            element: <AllFriends />,
+          },
+          {
+            path: RouteEnum.FRIEND_REQUEST,
+            element: <FriendRequest />,
+          },
+          {
+            path: RouteEnum.SENT_REQUEST,
+            element: <SentRequest />,
+          },
+        ],
       },
       {
         path: RouteEnum.ADMIN,
