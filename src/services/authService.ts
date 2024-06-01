@@ -43,3 +43,24 @@ export async function registerService(authDetail: any) {
     return null;
   }
 }
+
+export async function logoutService() {
+  try {
+    const response = await axios.post(
+      import.meta.env.VITE_SERVER_URL + "/api/auth/logout",
+      {},
+      {
+        withCredentials: true,
+      },
+    );
+
+    if (response.status === 200) {
+      toast.success("Logout successfully!");
+      return response.data;
+    }
+  } catch (error) {
+    // @ts-ignore
+    toast.error(error.response.data);
+    return null;
+  }
+}

@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks";
 import { LOGOUT } from "../../store/authSlice.ts";
 import avatarBackup from "/public/assets/images/avatar_backup.jpg";
 import { RouteEnum } from "../../enums";
+import { logoutService } from "../../services";
 
 export const DropDownProfile = () => {
   const { user, profile } = useAppSelector((state) => state.auth);
@@ -11,6 +12,12 @@ export const DropDownProfile = () => {
     import.meta.env.VITE_SERVER_URL + "/" + profile?.profilePictureUrl;
 
   const dispatch = useAppDispatch();
+
+  async function handleLogout() {
+    await logoutService();
+    dispatch(LOGOUT());
+  }
+
   return (
     <>
       <div className="dropdown dropdown-end">
@@ -42,7 +49,7 @@ export const DropDownProfile = () => {
                 <Link to={RouteEnum.SETTINGS}>Settings</Link>
               </li>
               <li>
-                <button onClick={() => dispatch(LOGOUT())}>Logout</button>
+                <button onClick={handleLogout}>Logout</button>
               </li>
             </>
           ) : (

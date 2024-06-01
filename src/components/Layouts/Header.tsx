@@ -1,6 +1,6 @@
 import { DropdownNavbar, DropDownProfile } from "../Elements";
 import { Link, NavLink } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RouteEnum } from "../../enums";
 
 enum Theme {
@@ -28,9 +28,30 @@ export const Header = () => {
     }
   };
 
+  const [showNavbar, setShowNavbar] = useState(true);
+  const prevScrollPos = useRef(window.scrollY);
+
+  const handleScroll = () => {
+    const currentScrollPos = window.scrollY;
+    const isScrollingUp = prevScrollPos.current > currentScrollPos;
+
+    setShowNavbar(isScrollingUp);
+    prevScrollPos.current = currentScrollPos;
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <>
-      <header className="navbar bg-base-200 p-6">
+      <header
+        className={`sticky z-10 top-0 navbar bg-base-200 p-6 ${showNavbar ? "visible" : "invisible"}`}
+      >
         <div className="navbar-start">
           <DropdownNavbar />
           <Link

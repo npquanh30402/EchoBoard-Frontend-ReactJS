@@ -11,6 +11,7 @@ import {
   PageNotFound,
   Register,
   SentRequest,
+  SettingPage,
 } from "../pages";
 import { AdminProtectedRoute } from "./AdminProtectedRoute.tsx";
 import { RouteEnum } from "../enums";
@@ -69,6 +70,14 @@ export const Router = createBrowserRouter([
       {
         path: RouteEnum.CONVERSATION,
         element: <ConversationPage />,
+      },
+      {
+        path: RouteEnum.SETTINGS,
+        element: (
+          <AuthProtectedRoute>
+            <SettingPage />
+          </AuthProtectedRoute>
+        ),
       },
       {
         path: "/*",

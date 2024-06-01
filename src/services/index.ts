@@ -1,2 +1,2 @@
-export { registerService, loginService } from "./authService.ts";
-export { profileService } from "./profileService.ts";
+export { registerService, loginService, logoutService } from "./authService.ts";
+export { fetchProfileService, updateProfileService } from "./profileService.ts";

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useDocumentTitle } from "../../hooks";
 import React, { useState } from "react";
-import { loginService, profileService } from "../../services";
+import { fetchProfileService, loginService } from "../../services";
 import { LOGIN, PROFILE } from "../../store/authSlice.ts";
 import DOMPurify from "dompurify";
 import { UserInterface } from "../../interfaces";
@@ -61,7 +61,7 @@ export const Login = () => {
     if (data) {
       dispatch(LOGIN(data));
 
-      const profileData = await profileService(data.id);
+      const profileData = await fetchProfileService(data.id);
 
       dispatch(PROFILE(profileData));
 
