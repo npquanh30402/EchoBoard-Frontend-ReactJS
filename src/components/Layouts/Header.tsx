@@ -1,6 +1,7 @@
 import { DropdownNavbar, DropDownProfile } from "../Elements";
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { RouteEnum } from "../../enums";
 
 enum Theme {
   DARK = "dark",
@@ -32,7 +33,10 @@ export const Header = () => {
       <header className="navbar bg-base-200 p-6">
         <div className="navbar-start">
           <DropdownNavbar />
-          <Link to={"/"} className="btn btn-ghost text-2xl md:text-3xl">
+          <Link
+            to={RouteEnum.HOME}
+            className="btn btn-ghost text-2xl md:text-3xl"
+          >
             <i className="bi bi-signpost-fill"></i>
             EchoBoard
           </Link>
@@ -40,7 +44,7 @@ export const Header = () => {
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1 space-x-2">
             <li>
-              <NavLink to={"/"}>Homepage</NavLink>
+              <NavLink to={RouteEnum.HOME}>Homepage</NavLink>
             </li>
             <li>
               <details>

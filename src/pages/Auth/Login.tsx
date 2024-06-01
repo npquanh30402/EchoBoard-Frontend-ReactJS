@@ -5,6 +5,7 @@ import { loginService, profileService } from "../../services";
 import { LOGIN, PROFILE } from "../../store/authSlice.ts";
 import DOMPurify from "dompurify";
 import { UserInterface } from "../../interfaces";
+import { RouteEnum } from "../../enums";
 
 export const Login = () => {
   const [formData, setFormData] = useState({
@@ -138,7 +139,7 @@ export const Login = () => {
               >
                 Login
               </button>
-              <Link to={"/forgot-password"} className={"btn btn-ghost"}>
+              <Link to={RouteEnum.FORGOT_PASSWORD} className={"btn btn-ghost"}>
                 Forgot Password
               </Link>
             </div>

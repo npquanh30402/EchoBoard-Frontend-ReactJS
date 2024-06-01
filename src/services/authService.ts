@@ -8,6 +8,9 @@ export async function loginService(authDetail: any) {
       {
         ...authDetail,
       },
+      {
+        withCredentials: true,
+      },
     );
 
     if (response.status === 200) {

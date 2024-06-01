@@ -1,35 +1,47 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App.tsx";
-import { AdminPage, Homepage, Login, PageNotFound, Register } from "../pages";
+import {
+  AdminPage,
+  ConversationPage,
+  Homepage,
+  Login,
+  PageNotFound,
+  Register,
+} from "../pages";
 import { AdminProtectedRoute } from "./AdminProtectedRoute.tsx";
+import { RouteEnum } from "../enums";
 
 export const Router = createBrowserRouter([
   {
     element: <App />,
     children: [
       {
-        path: "/",
+        path: RouteEnum.HOME,
         element: <Homepage />,
       },
       {
-        path: "/register",
+        path: RouteEnum.REGISTER,
         element: <Register />,
       },
       {
-        path: "/login",
+        path: RouteEnum.LOGIN,
         element: <Login />,
       },
       {
-        path: "/forgot-password",
+        path: RouteEnum.FORGOT_PASSWORD,
         element: <Homepage />,
       },
       {
-        path: "/admin",
+        path: RouteEnum.ADMIN,
         element: (
           <AdminProtectedRoute>
             <AdminPage />
           </AdminProtectedRoute>
         ),
+      },
+      {
+        path: RouteEnum.CONVERSATION,
+        element: <ConversationPage />,
       },
       {
         path: "/*",

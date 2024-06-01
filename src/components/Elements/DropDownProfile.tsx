@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { LOGOUT } from "../../store/authSlice.ts";
 import avatarBackup from "/public/assets/images/avatar_backup.jpg";
+import { RouteEnum } from "../../enums";
 
 export const DropDownProfile = () => {
   const { user, profile } = useAppSelector((state) => state.auth);
@@ -32,10 +33,10 @@ export const DropDownProfile = () => {
           {user ? (
             <>
               <li className={"border-b mb-2 py-2"}>
-                <Link to={"/profile"}>{user.username}</Link>
+                <Link to={RouteEnum.PROFILE}>{user.username}</Link>
               </li>
               <li>
-                <Link to={"/settings"}>Settings</Link>
+                <Link to={RouteEnum.SETTINGS}>Settings</Link>
               </li>
               <li>
                 <button onClick={() => dispatch(LOGOUT())}>Logout</button>
@@ -44,10 +45,10 @@ export const DropDownProfile = () => {
           ) : (
             <>
               <li>
-                <Link to={"/register"}>Register</Link>
+                <Link to={RouteEnum.REGISTER}>Register</Link>
               </li>
               <li>
-                <Link to={"/login"}>Login</Link>
+                <Link to={RouteEnum.LOGIN}>Login</Link>
               </li>
             </>
           )}
