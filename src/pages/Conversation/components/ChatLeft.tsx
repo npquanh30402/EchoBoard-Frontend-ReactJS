@@ -1,4 +1,9 @@
-export const ChatLeft = () => {
+import avatarBackup from "/public/assets/images/avatar_backup.jpg";
+import { ConversationInterface } from "../../../interfaces";
+
+export const ChatLeft = ({ message }: { message: ConversationInterface }) => {
+  const profileImage =
+    import.meta.env.VITE_SERVER_URL + "/" + message.profilePictureUrl;
   return (
     <>
       <div className="chat chat-start">
@@ -6,15 +11,15 @@ export const ChatLeft = () => {
           <div className="w-10 rounded-full">
             <img
               alt="Tailwind CSS chat bubble component"
-              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+              src={message.profilePictureUrl ? profileImage : avatarBackup}
             />
           </div>
         </div>
         <div className="chat-header">
-          Obi-Wan Kenobi
-          <time className="text-xs opacity-50">12:45</time>
+          {message.username}
+          <time className="text-xs opacity-50">{message.date}</time>
         </div>
-        <div className="chat-bubble">You were the Chosen One!</div>
+        <div className="chat-bubble">{message.message}</div>
         <div className="chat-footer opacity-50">Delivered</div>
       </div>
     </>

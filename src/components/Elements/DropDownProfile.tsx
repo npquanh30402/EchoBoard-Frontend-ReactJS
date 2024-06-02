@@ -46,6 +46,9 @@ export const DropDownProfile = () => {
                 <Link to={RouteEnum.FRIEND}>Friends</Link>
               </li>
               <li>
+                <Link to={RouteEnum.CONVERSATION}>Chat</Link>
+              </li>
+              <li>
                 <Link to={RouteEnum.SETTINGS}>Settings</Link>
               </li>
               <li>
