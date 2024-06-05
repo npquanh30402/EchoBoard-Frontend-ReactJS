@@ -1,10 +1,14 @@
 import { FriendInterface } from "../../../interfaces";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { SET_ACTIVE_USER } from "../../../store/conversationSlice.ts";
+import {
+  DECREASE_UNREAD_COUNT,
+  SET_ACTIVE_USER,
+} from "../../../store/conversationSlice.ts";
 import { useEffect, useState } from "react";
 
 export const FriendItem = ({ friend }: { friend: FriendInterface }) => {
+  const { unread_counts } = useAppSelector((state) => state.conversation);
   const profileImage =
     import.meta.env.VITE_SERVER_URL + "/" + friend?.profilePictureUrl;
 
@@ -21,11 +25,16 @@ export const FriendItem = ({ friend }: { friend: FriendInterface }) => {
     }
   }, [activeUser?.id, friend?.id]);
 
+  function handleRequestChat() {
+    dispatch(SET_ACTIVE_USER(friend));
+    dispatch(DECREASE_UNREAD_COUNT(friend.id));
+  }
+
   return (
     <>
       <div
         className={`card card-compact bg-base-100 border ${isActive ? "border-red-500" : ""}`}
-        onClick={() => dispatch(SET_ACTIVE_USER(friend))}
+        onClick={handleRequestChat}
       >
         <div className="card-body flex-row items-center justify-between">
           <div className="avatar">
@@ -36,7 +45,14 @@ export const FriendItem = ({ friend }: { friend: FriendInterface }) => {
               />
             </div>
           </div>
-          <h2 className="card-title">{friend.username}</h2>
+          <div className="card-title">
+            <span>{friend.username}</span>
+            {unread_counts[friend.id] > 0 && (
+              <div className="badge badge-primary">
+                {unread_counts[friend.id]}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>

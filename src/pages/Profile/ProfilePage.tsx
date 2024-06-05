@@ -28,6 +28,7 @@ export const ProfilePage = () => {
   const { sendJsonMessage } = useCustomWebsocket(
     import.meta.env.VITE_WEBSOCKET_URL +
       "/api/notification/central-notification",
+    "Central Notification",
   );
 
   async function handleSendFriendRequest() {

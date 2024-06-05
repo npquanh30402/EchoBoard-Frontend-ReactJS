@@ -1,31 +1,30 @@
 import { FriendItem } from "./FriendItem.tsx";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { fetchFriendService } from "../../../services";
+import { SET_FRIEND_LIST } from "../../../store/friendSlice.ts";
 
 export const FriendSidebar = () => {
   const { friendList } = useAppSelector((state) => state.friend);
   const dispatch = useAppDispatch();
 
-  const [perPage] = useState(10);
-  const [page] = useState(1);
-
   useEffect(() => {
     async function fetchFriend() {
-      const response = await fetchFriendService(page, perPage);
-      // if (response) {
-      //   dispatch(SET_FRIEND_LIST(response));
-      // }
-      console.log(response);
+      const response = await fetchFriendService(1, 10);
+      if (response) {
+        dispatch(SET_FRIEND_LIST(response));
+      }
     }
 
-    if (friendList?.length === 0) {
-      fetchFriend();
-    }
-  }, [dispatch, friendList, page, perPage]);
+    fetchFriend();
+
+    // if (friendList?.length === 0) {
+    //   fetchFriend();
+    // }
+  }, [dispatch]);
 
   return (
-    <>
+    <div>
       <div className="drawer lg:drawer-open z-10">
         <input id="friend-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col items-center justify-center fixed top-[200px] opacity-60">
@@ -52,6 +51,6 @@ export const FriendSidebar = () => {
           </ul>
         </div>
       </div>
-    </>
+    </div>
   );
 };

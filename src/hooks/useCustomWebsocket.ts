@@ -1,19 +1,17 @@
 import useWebSocket from "react-use-websocket";
 import { QueryParams } from "react-use-websocket/dist/lib/types";
 
-export function useCustomWebsocket(
+export const useCustomWebsocket = (
   url: string,
+  type: string,
   queryParams: QueryParams | undefined = undefined,
-) {
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket(url, {
+) => {
+  return useWebSocket(url, {
     share: true,
     queryParams,
-    onOpen: () => console.log("opened"),
-    onClose: () => console.log("closed"),
-    onMessage: () => console.log("message"),
+    onOpen: () => console.log(`${type}, opened`),
+    onClose: () => console.log(`${type}, close`),
     shouldReconnect: () => true,
     retryOnError: true,
   });
-
-  return { sendJsonMessage, lastJsonMessage };
-}
+};

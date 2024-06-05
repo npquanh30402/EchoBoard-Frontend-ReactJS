@@ -2,10 +2,16 @@ import { DropdownNavbar, DropDownProfile } from "../Elements";
 import { Link } from "react-router-dom";
 import { RouteEnum } from "../../enums";
 import { ThemeToggle } from "../Elements/ThemeToggle.tsx";
-import { NotificationLink } from "../Elements/NotificationLink.tsx";
+import { NotificationHeader } from "../Elements/NotificationHeader.tsx";
 import { useAppSelector } from "../../hooks";
 import { useState } from "react";
 import { SearchModal } from "../Elements/SearchModal.tsx";
+import {
+  CentralConversationConWebsocket,
+  CentralNotificationWebsocket,
+  UserPrivateConversationWebsocket,
+} from "../Elements/Websockets";
+import { ConversationHeader } from "../Elements/ConversationHeader.tsx";
 
 export const Header = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -37,7 +43,8 @@ export const Header = () => {
           ></button>
         </div>
         <div className="navbar-end flex gap-2">
-          {user && <NotificationLink user={user} />}
+          {user && <ConversationHeader />}
+          {user && <NotificationHeader />}
           <ThemeToggle />
           <DropDownProfile />
         </div>
@@ -45,6 +52,10 @@ export const Header = () => {
       {showModal && (
         <SearchModal setShowModal={setShowModal} title={"Search"} />
       )}
+      {user && <CentralNotificationWebsocket />}
+      {/*{user && <UserPrivateNotifyWebsocket />}*/}
+      {user && <CentralConversationConWebsocket />}
+      {user && <UserPrivateConversationWebsocket />}
     </>
   );
 };

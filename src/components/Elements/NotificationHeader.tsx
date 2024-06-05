@@ -5,7 +5,6 @@ import {
   useAppSelector,
   useCustomWebsocket,
 } from "../../hooks";
-import { UserInterface } from "../../interfaces";
 import { useEffect } from "react";
 import {
   ADD_NOTIFICATION,
@@ -13,20 +12,17 @@ import {
 } from "../../store/notificationSlice.ts";
 import { fetchNotificationUnreadCountService } from "../../services";
 
-export const NotificationLink = ({ user }: { user: UserInterface }) => {
+export const NotificationHeader = () => {
+  const { user } = useAppSelector((state) => state.auth);
   const { unread_count } = useAppSelector((state) => state.notification);
+
   const dispatch = useAppDispatch();
 
-  useCustomWebsocket(
+  const { lastJsonMessage } = useCustomWebsocket(
     import.meta.env.VITE_WEBSOCKET_URL +
-      "/api/notification/central-notification",
+      `/api/notification/private-notification/${user?.id}`,
+    "Private Notification",
   );
-
-  const socketUrl =
-    import.meta.env.VITE_WEBSOCKET_URL +
-    `/api/notification/private-notification/${user.id}`;
-
-  const { lastJsonMessage } = useCustomWebsocket(socketUrl);
 
   useEffect(() => {
     async function fetchData() {
