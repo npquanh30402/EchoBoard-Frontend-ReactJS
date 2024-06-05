@@ -1,10 +1,11 @@
 import { useAppDispatch, useAppSelector, useDocumentTitle } from "../../hooks";
 import React, { useState } from "react";
-import avatarBackup from "/public/assets/images/avatar_backup.jpg";
+import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { PROFILE } from "../../store/authSlice.ts";
 import { updateProfileService } from "../../services";
 import { ProfileInterface } from "../../interfaces";
 import { toast } from "react-toastify";
+import { sanitizeAndTrimString } from "../../utils";
 
 export const SettingPage = () => {
   useDocumentTitle("Settings");
@@ -59,25 +60,27 @@ export const SettingPage = () => {
   ) => {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    const formDataObject = new FormData();
 
-    const fullNameInput = formData.get("fullName") as string;
-    const bioInput = formData.get("bio") as string;
+    if (formData.fullName !== profile?.fullName) {
+      formDataObject.append(
+        "fullName",
+        sanitizeAndTrimString(formData.fullName),
+      );
+    }
+
+    if (formData.bio !== profile?.bio) {
+      formDataObject.append("bio", sanitizeAndTrimString(formData.bio));
+    }
 
     if (selectedFile) {
-      formData.append("profilePictureFile", selectedFile);
+      formDataObject.append("profilePictureUrl", selectedFile);
       setSelectedFile(null);
     }
 
-    if (fullNameInput !== profile?.fullName) {
-      formData.append("fullName", formData.get("fullName") as string);
-    }
-
-    if (bioInput !== profile?.bio) {
-      formData.append("bio", formData.get("bio") as string);
-    }
-
-    const data = (await updateProfileService(formData)) as ProfileInterface;
+    const data = (await updateProfileService(
+      formDataObject,
+    )) as ProfileInterface;
 
     if (data) {
       toast.success("Updated successfully!");
@@ -105,7 +108,7 @@ export const SettingPage = () => {
               />
               <input
                 type="file"
-                name={"upload-avatar"}
+                name={"profilePictureUrl"}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 onChange={handleFileChange}
               />

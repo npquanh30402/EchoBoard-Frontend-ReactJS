@@ -1,3 +1,6 @@
+import { NavLink } from "react-router-dom";
+import { RouteEnum } from "../../enums";
+
 export const DropdownNavbar = () => {
   return (
     <>
@@ -10,7 +13,7 @@ export const DropdownNavbar = () => {
           className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
         >
           <li>
-            <a>Item 1</a>
+            <NavLink to={RouteEnum.HOME}>Homepage</NavLink>
           </li>
           <li>
             <a>Parent</a>

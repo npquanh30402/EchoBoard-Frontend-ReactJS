@@ -2,16 +2,22 @@ import React, { useState } from "react";
 import { useDocumentTitle } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import { registerService } from "../../services";
-import DOMPurify from "dompurify";
+import { sanitizeAndTrimString } from "../../utils";
 
 export const Register = () => {
+  useDocumentTitle("Register");
+
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
+    username: "",
     email: "",
     password: "",
     confirm_password: "",
   });
 
   const [errors, setErrors] = useState({
+    username: "",
     email: "",
     password: "",
     confirm_password: "",
@@ -34,6 +40,12 @@ export const Register = () => {
         ...errors,
         email: /\S+@\S+\.\S+/.test(value) ? "" : "Email is not valid",
       });
+    } else if (name === "username") {
+      setErrors({
+        ...errors,
+        username:
+          value.length < 3 ? "Username must be at least 3 characters long" : "",
+      });
     } else if (name === "password") {
       setErrors({
         ...errors,
@@ -49,22 +61,29 @@ export const Register = () => {
     }
   };
 
-  useDocumentTitle("Register");
-
-  const navigate = useNavigate();
+  const isFormValid = () => {
+    return (
+      !errors.username &&
+      !errors.email &&
+      !errors.password &&
+      !errors.confirm_password &&
+      formData.username &&
+      formData.email &&
+      formData.password &&
+      formData.confirm_password
+    );
+  };
 
   async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    const formDataObject = new FormData();
 
-    const authDetail = {
-      username: DOMPurify.sanitize(formData.get("username") as string),
-      email: DOMPurify.sanitize(formData.get("email") as string),
-      password: DOMPurify.sanitize(formData.get("password") as string),
-    };
+    formDataObject.append("username", sanitizeAndTrimString(formData.username));
+    formDataObject.append("email", sanitizeAndTrimString(formData.email));
+    formDataObject.append("password", sanitizeAndTrimString(formData.password));
 
-    const data = await registerService(authDetail);
+    const data = await registerService(formDataObject);
 
     if (data) {
       navigate("/login");
@@ -81,16 +100,25 @@ export const Register = () => {
             Register
           </h1>
           <form className={"flex flex-col gap-4"} onSubmit={handleRegister}>
-            <label className="input input-bordered flex items-center gap-2">
-              <i className="bi bi-person text-xl"></i>
-              <input
-                type="text"
-                placeholder="Username"
-                className={"grow"}
-                name={"username"}
-                autoComplete={"off"}
-              />
-            </label>
+            <div className={"text-left"}>
+              <label
+                className={`input input-bordered flex items-center gap-2 ${errors.email && "input-error"}`}
+              >
+                <i className="bi bi-person text-xl"></i>
+                <input
+                  type="text"
+                  placeholder="Username"
+                  className={"grow"}
+                  name={"username"}
+                  value={formData.username}
+                  onChange={handleChange}
+                  autoComplete={"off"}
+                />
+              </label>
+              {errors.username && (
+                <p className={"text-sm text-red-500 mt-2"}>{errors.username}</p>
+              )}
+            </div>
             <div className={"text-left"}>
               <label
                 className={`input input-bordered flex items-center gap-2 ${errors.email && "input-error"}`}
@@ -192,12 +220,7 @@ export const Register = () => {
                 </p>
               )}
             </div>
-            <button
-              disabled={
-                !!(errors.email || errors.password || errors.confirm_password)
-              }
-              className={"btn btn-primary"}
-            >
+            <button disabled={!isFormValid()} className={"btn btn-primary"}>
               Register
             </button>
           </form>

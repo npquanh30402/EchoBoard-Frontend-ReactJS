@@ -1,101 +1,50 @@
 import { DropdownNavbar, DropDownProfile } from "../Elements";
-import { Link, NavLink } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { RouteEnum } from "../../enums";
-
-enum Theme {
-  DARK = "dark",
-  LIGHT = "light",
-}
+import { ThemeToggle } from "../Elements/ThemeToggle.tsx";
+import { NotificationLink } from "../Elements/NotificationLink.tsx";
+import { useAppSelector } from "../../hooks";
+import { useState } from "react";
+import { SearchModal } from "../Elements/SearchModal.tsx";
 
 export const Header = () => {
-  const [theme, setTheme] = useState(
-    localStorage.getItem("theme") || Theme.DARK,
-  );
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    document.documentElement.setAttribute("class", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    if (theme === Theme.DARK) {
-      setTheme(Theme.LIGHT);
-      localStorage.setItem("theme", Theme.LIGHT);
-    } else {
-      setTheme(Theme.DARK);
-      localStorage.setItem("theme", Theme.DARK);
-    }
-  };
-
-  const [showNavbar, setShowNavbar] = useState(true);
-  const prevScrollPos = useRef(window.scrollY);
-
-  const handleScroll = () => {
-    const currentScrollPos = window.scrollY;
-    const isScrollingUp = prevScrollPos.current > currentScrollPos;
-
-    setShowNavbar(isScrollingUp);
-    prevScrollPos.current = currentScrollPos;
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+  const { user } = useAppSelector((state) => state.auth);
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <>
-      <header
-        className={`sticky z-10 top-0 navbar bg-base-200 p-6 ${showNavbar ? "visible" : "invisible"}`}
-      >
-        <div className="navbar-start">
+      <header className={"sticky z-10 top-0 navbar bg-base-200 p-6"}>
+        <div className="navbar-start gap-2">
           <DropdownNavbar />
           <Link
             to={RouteEnum.HOME}
-            className="btn btn-ghost text-2xl md:text-3xl"
+            className="btn btn-ghost text-2xl md:text-3xl hidden md:block"
           >
-            <i className="bi bi-signpost-fill"></i>
-            EchoBoard
+            <div className={"flex justify-center items-center gap-2"}>
+              <i className="bi bi-signpost-fill"></i>
+              <span>EchoBoard</span>
+            </div>
           </Link>
-        </div>
-        <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1 space-x-2">
-            <li>
-              <NavLink to={RouteEnum.HOME}>Homepage</NavLink>
-            </li>
-            <li>
-              <details>
-                <summary>Parent</summary>
-                <ul className="p-2">
-                  <li>
-                    <a>Submenu 1</a>
-                  </li>
-                  <li>
-                    <a>Submenu 2</a>
-                  </li>
-                </ul>
-              </details>
-            </li>
-            <li>
-              <a>Item 3</a>
-            </li>
-          </ul>
+          {/*<form className={"form-control hidden md:block"}>*/}
+          {/*  <label className="input input-bordered flex items-center gap-2">*/}
+          {/*    <i className={"bi bi-search text-xl"}></i>*/}
+          {/*    <input type="text" className="grow" placeholder="Search..." />*/}
+          {/*  </label>*/}
+          {/*</form>*/}
+          <button
+            className={"btn btn-ghost bi bi-search text-xl cursor-pointer"}
+            onClick={() => setShowModal(true)}
+          ></button>
         </div>
         <div className="navbar-end flex gap-2">
-          <button onClick={toggleTheme} className="btn btn-ghost btn-circle">
-            {theme !== Theme.DARK ? (
-              <i className="bi bi-brightness-high text-xl"></i>
-            ) : (
-              <i className="bi bi-moon text-xl"></i>
-            )}
-          </button>
+          {user && <NotificationLink user={user} />}
+          <ThemeToggle />
           <DropDownProfile />
         </div>
       </header>
+      {showModal && (
+        <SearchModal setShowModal={setShowModal} title={"Search"} />
+      )}
     </>
   );
 };

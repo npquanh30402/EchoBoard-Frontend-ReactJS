@@ -1,13 +1,11 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export async function loginService(authDetail: any) {
+export async function loginService(formData: object) {
   try {
     const response = await axios.post(
       import.meta.env.VITE_SERVER_URL + "/api/auth/login",
-      {
-        ...authDetail,
-      },
+      formData,
       {
         withCredentials: true,
       },
@@ -24,13 +22,11 @@ export async function loginService(authDetail: any) {
   }
 }
 
-export async function registerService(authDetail: any) {
+export async function registerService(formData: object) {
   try {
     const response = await axios.post(
       import.meta.env.VITE_SERVER_URL + "/api/auth/register",
-      {
-        ...authDetail,
-      },
+      formData,
     );
 
     if (response.status === 201) {

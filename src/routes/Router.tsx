@@ -8,7 +8,9 @@ import {
   FriendRequest,
   Homepage,
   Login,
+  NotificationPage,
   PageNotFound,
+  ProfilePage,
   Register,
   SentRequest,
   SettingPage,
@@ -36,6 +38,18 @@ export const Router = createBrowserRouter([
       {
         path: RouteEnum.FORGOT_PASSWORD,
         element: <Homepage />,
+      },
+      {
+        path: RouteEnum.NOTIFICATION,
+        element: <NotificationPage />,
+      },
+      {
+        path: RouteEnum.PROFILE,
+        element: (
+          <AuthProtectedRoute>
+            <ProfilePage />
+          </AuthProtectedRoute>
+        ),
       },
       {
         path: RouteEnum.FRIEND,

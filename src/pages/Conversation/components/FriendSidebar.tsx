@@ -1,22 +1,22 @@
 import { FriendItem } from "./FriendItem.tsx";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { useEffect, useState } from "react";
-import { fetchFriendService } from "../../../services/friendService.ts";
-import { SET_FRIEND_LIST } from "../../../store/friendSlice.ts";
+import { fetchFriendService } from "../../../services";
 
 export const FriendSidebar = () => {
   const { friendList } = useAppSelector((state) => state.friend);
   const dispatch = useAppDispatch();
 
-  const [perPage, setPerPage] = useState(10);
-  const [page, setPage] = useState(1);
+  const [perPage] = useState(10);
+  const [page] = useState(1);
 
   useEffect(() => {
     async function fetchFriend() {
       const response = await fetchFriendService(page, perPage);
-      if (response) {
-        dispatch(SET_FRIEND_LIST(response));
-      }
+      // if (response) {
+      //   dispatch(SET_FRIEND_LIST(response));
+      // }
+      console.log(response);
     }
 
     if (friendList?.length === 0) {

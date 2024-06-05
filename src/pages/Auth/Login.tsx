@@ -3,27 +3,22 @@ import { useAppDispatch, useDocumentTitle } from "../../hooks";
 import React, { useState } from "react";
 import { fetchProfileService, loginService } from "../../services";
 import { LOGIN, PROFILE } from "../../store/authSlice.ts";
-import DOMPurify from "dompurify";
 import { UserInterface } from "../../interfaces";
 import { RouteEnum } from "../../enums";
+import { sanitizeAndTrimString } from "../../utils";
 
 export const Login = () => {
+  useDocumentTitle("Login");
+
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-  });
-
   const [showPassword, setShowPassword] = useState(false);
-
-  useDocumentTitle("Login");
-
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -31,32 +26,21 @@ export const Login = () => {
       ...formData,
       [name]: value,
     });
+  };
 
-    if (name === "email") {
-      setErrors({
-        ...errors,
-        email: /\S+@\S+\.\S+/.test(value) ? "" : "Email is not valid",
-      });
-    } else if (name === "password") {
-      setErrors({
-        ...errors,
-        password:
-          value.length < 8 ? "Password must be at least 8 characters long" : "",
-      });
-    }
+  const isFormValid = () => {
+    return formData.email && formData.password;
   };
 
   async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    const formDataObject = new FormData();
 
-    const authDetail = {
-      email: DOMPurify.sanitize(formData.get("email") as string),
-      password: DOMPurify.sanitize(formData.get("password") as string),
-    };
+    formDataObject.append("email", sanitizeAndTrimString(formData.email));
+    formDataObject.append("password", sanitizeAndTrimString(formData.password));
 
-    const data = (await loginService(authDetail)) as UserInterface;
+    const data = (await loginService(formDataObject)) as UserInterface;
 
     if (data) {
       dispatch(LOGIN(data));
@@ -80,9 +64,7 @@ export const Login = () => {
           </h1>
           <form className={"flex flex-col gap-4"} onSubmit={handleLogin}>
             <div className={"text-left"}>
-              <label
-                className={`input input-bordered flex items-center gap-2 ${errors.email && "input-error"}`}
-              >
+              <label className={`input input-bordered flex items-center gap-2`}>
                 <i className="bi bi-envelope text-xl"></i>
                 <input
                   type="text"
@@ -94,14 +76,9 @@ export const Login = () => {
                   autoComplete={"off"}
                 />
               </label>
-              {errors.email && (
-                <p className={"text-sm text-red-500 mt-2"}>{errors.email}</p>
-              )}
             </div>
             <div className={"text-left"}>
-              <label
-                className={`input input-bordered flex items-center gap-2 ${errors.password && "input-error"}`}
-              >
+              <label className={`input input-bordered flex items-center gap-2`}>
                 <i className="bi bi-key text-xl"></i>
                 <input
                   type={`${showPassword ? "text" : "password"}`}
@@ -124,19 +101,13 @@ export const Login = () => {
                   ></i>
                 )}
               </label>
-              {errors.password && (
-                <p className={"text-sm text-red-500 mt-2"}>{errors.password}</p>
-              )}
             </div>
             <div
               className={
                 "flex flex-col md:flex-row justify-between items-center"
               }
             >
-              <button
-                className={`btn btn-primary`}
-                disabled={!!(errors.email || errors.password)}
-              >
+              <button className={`btn btn-primary`} disabled={!isFormValid()}>
                 Login
               </button>
               <Link to={RouteEnum.FORGOT_PASSWORD} className={"btn btn-ghost"}>

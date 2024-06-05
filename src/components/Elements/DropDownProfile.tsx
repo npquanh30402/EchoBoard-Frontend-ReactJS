@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { LOGOUT } from "../../store/authSlice.ts";
-import avatarBackup from "/public/assets/images/avatar_backup.jpg";
+import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { RouteEnum } from "../../enums";
-import { logoutService } from "../../services";
+import { toast } from "react-toastify";
 
 export const DropDownProfile = () => {
   const { user, profile } = useAppSelector((state) => state.auth);
@@ -14,8 +14,8 @@ export const DropDownProfile = () => {
   const dispatch = useAppDispatch();
 
   async function handleLogout() {
-    await logoutService();
     dispatch(LOGOUT());
+    toast.success("Logout Successful!");
   }
 
   return (

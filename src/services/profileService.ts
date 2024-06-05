@@ -17,7 +17,7 @@ export async function fetchProfileService(id: string) {
   }
 }
 
-export async function updateProfileService(formData: FormData) {
+export async function updateProfileService(formData: object) {
   try {
     const response = await axios.patch(
       import.meta.env.VITE_SERVER_URL + "/api/profile",

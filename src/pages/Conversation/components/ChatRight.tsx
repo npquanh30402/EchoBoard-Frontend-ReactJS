@@ -1,4 +1,4 @@
-import avatarBackup from "/public/assets/images/avatar_backup.jpg";
+import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { ConversationInterface } from "../../../interfaces";
 
 export const ChatRight = ({ message }: { message: ConversationInterface }) => {

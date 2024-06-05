@@ -1,5 +1,5 @@
 import { FriendInterface } from "../../../interfaces";
-import avatarBackup from "/public/assets/images/avatar_backup.jpg";
+import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { SET_ACTIVE_USER } from "../../../store/conversationSlice.ts";
 import { useEffect, useState } from "react";

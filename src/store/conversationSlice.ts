@@ -21,12 +21,12 @@ export const conversationSlice = createSlice({
       state.activeUser = action.payload;
     },
     ADD_MESSAGE: (state, action) => {
-      const userId = state.activeUser?.id as string;
+      const userId = action.payload.userId as string;
 
       if (state.messages[userId]) {
-        state.messages[userId].push(action.payload);
+        state.messages[userId].push(action.payload.message);
       } else {
-        state.messages[userId] = [action.payload];
+        state.messages[userId] = [action.payload.message];
       }
     },
   },
