@@ -9,8 +9,9 @@ export const useCustomWebsocket = (
   return useWebSocket(url, {
     share: true,
     queryParams,
-    // onOpen: () => console.log(`${type}, opened`),
-    // onClose: () => console.log(`${type}, close`),
+    // onOpen: () => console.log(`${_type}, opened`),
+    // onClose: () => console.log(`${_type}, close`),
+    // onMessage: (msg) => console.log(JSON.parse(msg.data)),
     shouldReconnect: () => true,
     retryOnError: true,
   });

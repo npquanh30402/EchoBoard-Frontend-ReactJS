@@ -41,7 +41,11 @@ export const Router = createBrowserRouter([
       },
       {
         path: RouteEnum.NOTIFICATION,
-        element: <NotificationPage />,
+        element: (
+          <AuthProtectedRoute>
+            <NotificationPage />
+          </AuthProtectedRoute>
+        ),
       },
       {
         path: RouteEnum.PROFILE,
@@ -83,7 +87,11 @@ export const Router = createBrowserRouter([
       },
       {
         path: RouteEnum.CONVERSATION,
-        element: <ConversationPage />,
+        element: (
+          <AuthProtectedRoute>
+            <ConversationPage />
+          </AuthProtectedRoute>
+        ),
       },
       {
         path: RouteEnum.SETTINGS,

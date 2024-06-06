@@ -1,11 +1,11 @@
 export interface NotificationInterface {
-  id: string;
+  id?: string;
   type: string;
   content: string;
   metadata?: {
-    from: string;
-    related_id: string;
-    additional_info?: object;
+    from?: string | undefined;
+    related_id?: string | undefined;
+    additional_info?: object | null;
   };
   read?: boolean;
   createdAt?: Date;

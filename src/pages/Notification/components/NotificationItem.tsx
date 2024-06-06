@@ -15,7 +15,7 @@ export const NotificationItem = ({
   const dispatch = useAppDispatch();
 
   async function markAsRead() {
-    const response = await markNotificationAsReadService(notification.id);
+    const response = await markNotificationAsReadService(notification.id!);
 
     if (response) {
       dispatch(MARK_READ_NOTIFICATION(notification.id));
@@ -42,8 +42,6 @@ export const NotificationItem = ({
       iconClass: "bi bi-bell",
     },
   };
-
-  console.log(notification.type);
 
   const { alertClass, iconClass } =
     notificationStyles[notification.type] || notificationStyles.default;

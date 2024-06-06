@@ -8,7 +8,7 @@ export const Tab = () => {
     isActive: boolean;
     isPending: boolean;
   }) {
-    let classes = "tab";
+    let classes = "tab p-6 flex flex-col justify-center items-center font-bold";
     if (isPending) {
       classes += " pending";
     } else if (isActive) {
@@ -19,7 +19,7 @@ export const Tab = () => {
 
   return (
     <>
-      <div role="tablist" className="tabs tabs-boxed">
+      <div role="tablist" className="tabs tabs-boxed mb-6">
         <NavLink to={"friend-request"} role="tab" className={tabClassName}>
           Friend Requests
         </NavLink>

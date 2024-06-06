@@ -5,12 +5,14 @@ type NotificationStateType = {
   notifications: NotificationInterface[];
   unread_count: number;
   fetchCursor: CursorSearchInterface | undefined;
+  isFinished: boolean;
 };
 
 const notificationInitialState: NotificationStateType = {
   notifications: [],
   unread_count: 0,
   fetchCursor: undefined,
+  isFinished: false,
 };
 
 export const notificationSlice = createSlice({
@@ -23,17 +25,13 @@ export const notificationSlice = createSlice({
     SET_NOTIFICATIONS: (state, action) => {
       if (action.payload.length > 0) {
         state.notifications = [...state.notifications, ...action.payload];
-        // state.unread_count = state.notifications.reduce(
-        //   (count, notification) => {
-        //     return count + (notification.read ? 0 : 1);
-        //   },
-        //   0,
-        // );
         const lastItem = state.notifications[state.notifications.length - 1];
         state.fetchCursor = {
-          id: lastItem.id,
+          id: lastItem.id!,
           createdAt: lastItem.createdAt,
         };
+      } else {
+        state.isFinished = true;
       }
     },
     ADD_NOTIFICATION: (state, action) => {
@@ -41,7 +39,7 @@ export const notificationSlice = createSlice({
       state.unread_count++;
       const lastItem = state.notifications[state.notifications.length - 1];
       state.fetchCursor = {
-        id: lastItem.id,
+        id: lastItem.id!,
         createdAt: lastItem.createdAt,
       };
     },

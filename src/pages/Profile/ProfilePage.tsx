@@ -10,7 +10,7 @@ import { PageNotFound } from "../Other/PageNotFound.tsx";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import {
   useAppSelector,
-  useCustomWebsocket,
+  useCentralNotificationWebSocket,
   useDocumentTitle,
 } from "../../hooks";
 import { toast } from "react-toastify";
@@ -24,12 +24,7 @@ export const ProfilePage = () => {
   const [friendshipStatus, setFriendshipStatus] = useState("none");
 
   useDocumentTitle(`${profile?.username}'s profile`);
-
-  const { sendJsonMessage } = useCustomWebsocket(
-    import.meta.env.VITE_WEBSOCKET_URL +
-      "/api/notification/central-notification",
-    "Central Notification",
-  );
+  const { sendNotification } = useCentralNotificationWebSocket();
 
   async function handleSendFriendRequest() {
     const response = await sendFriendRequestService(profile?.id as string);
@@ -39,15 +34,17 @@ export const ProfilePage = () => {
       setFriendshipStatus("pending");
     }
 
-    sendJsonMessage({
-      type: "friend_request",
-      content: `User ${user?.username} has send you a friend request`,
-      metadata: {
-        from: user?.username,
-        related_id: user?.id,
+    sendNotification(
+      {
+        type: "friend_request",
+        content: `User ${user?.username} has send you a friend request`,
+        metadata: {
+          from: user?.username,
+          related_id: user?.id,
+        },
       },
-      receiverId: profile?.id as string,
-    });
+      profile?.id as string,
+    );
   }
 
   useEffect(() => {

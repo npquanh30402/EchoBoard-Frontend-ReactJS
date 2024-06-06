@@ -6,7 +6,7 @@ import { fetchNotificationListService } from "../../services";
 
 export const NotificationPage = () => {
   useDocumentTitle("Notifications");
-  const { notifications, fetchCursor } = useAppSelector(
+  const { notifications, fetchCursor, isFinished } = useAppSelector(
     (state) => state.notification,
   );
   const dispatch = useAppDispatch();
@@ -19,6 +19,7 @@ export const NotificationPage = () => {
   }, []);
 
   async function fetchData() {
+    if (isFinished) return;
     setLoading(true);
     const formData = {
       cursor: fetchCursor,

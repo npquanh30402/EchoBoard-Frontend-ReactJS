@@ -1,6 +1,7 @@
 export interface FriendInterface {
   id: string;
   username: string;
-  email?: string;
+  fullName?: string;
   profilePictureUrl?: string;
+  createdAt?: Date;
 }

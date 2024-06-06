@@ -1,4 +1,8 @@
-import { DropdownNavbar, DropDownProfile } from "../Elements";
+import {
+  DropdownNavbar,
+  DropDownProfile,
+  WebSocketInitialization,
+} from "../Elements";
 import { Link } from "react-router-dom";
 import { RouteEnum } from "../../enums";
 import { ThemeToggle } from "../Elements/ThemeToggle.tsx";
@@ -6,11 +10,6 @@ import { NotificationHeader } from "../Elements/NotificationHeader.tsx";
 import { useAppSelector } from "../../hooks";
 import { useState } from "react";
 import { SearchModal } from "../Elements/SearchModal.tsx";
-import {
-  CentralConversationConWebsocket,
-  CentralNotificationWebsocket,
-  UserPrivateConversationWebsocket,
-} from "../Elements/Websockets";
 import { ConversationHeader } from "../Elements/ConversationHeader.tsx";
 
 export const Header = () => {
@@ -38,11 +37,13 @@ export const Header = () => {
           {/*  </label>*/}
           {/*</form>*/}
           <button
-            className={"btn btn-ghost bi bi-search text-xl cursor-pointer"}
+            className={
+              "btn btn-ghost bi bi-search text-xl cursor-pointer hidden md:block"
+            }
             onClick={() => setShowModal(true)}
           ></button>
         </div>
-        <div className="navbar-end flex gap-2">
+        <div className="navbar-end flex md:gap-2">
           {user && <ConversationHeader />}
           {user && <NotificationHeader />}
           <ThemeToggle />
@@ -52,10 +53,7 @@ export const Header = () => {
       {showModal && (
         <SearchModal setShowModal={setShowModal} title={"Search"} />
       )}
-      {user && <CentralNotificationWebsocket />}
-      {/*{user && <UserPrivateNotifyWebsocket />}*/}
-      {user && <CentralConversationConWebsocket />}
-      {user && <UserPrivateConversationWebsocket />}
+      {user && <WebSocketInitialization />}
     </>
   );
 };

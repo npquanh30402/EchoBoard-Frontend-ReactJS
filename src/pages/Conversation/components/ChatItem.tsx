@@ -87,18 +87,22 @@ export const ChatItem = () => {
         className={"flex flex-col gap-2 mt-"}
         onSubmit={handleClickSendMessage}
       >
-        <label className={"font-bold"}>Enter your message:</label>
-        <div className={"flex gap-2 h-full"}>
-          <input
-            className="input input-bordered w-full h-full"
-            name={"message"}
-            value={formData.message}
-            onChange={handleChange}
-          ></input>
-          <button type={"submit"} className={"btn btn-primary h-full"}>
-            Send
-          </button>
-        </div>
+        {activeUser && (
+          <>
+            <label className={"font-bold"}>Enter your message:</label>
+            <div className={"flex gap-2 h-full"}>
+              <input
+                className="input input-bordered w-full h-full"
+                name={"message"}
+                value={formData.message}
+                onChange={handleChange}
+              ></input>
+              <button type={"submit"} className={"btn btn-primary h-full"}>
+                Send
+              </button>
+            </div>
+          </>
+        )}
       </form>
     </div>
   );

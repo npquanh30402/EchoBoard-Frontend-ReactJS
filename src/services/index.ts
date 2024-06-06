@@ -8,6 +8,10 @@ export {
 export { UserSearchService } from "./userService.ts";
 export {
   fetchFriendService,
+  fetchRequestSentService,
+  fetchFriendRequestService,
   sendFriendRequestService,
   fetchFriendshipStatusService,
+  acceptFriendRequestService,
+  deleteRequestSentService,
 } from "./friendService.ts";

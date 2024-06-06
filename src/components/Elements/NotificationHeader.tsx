@@ -1,28 +1,14 @@
 import { RouteEnum } from "../../enums";
 import { Link } from "react-router-dom";
-import {
-  useAppDispatch,
-  useAppSelector,
-  useCustomWebsocket,
-} from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useEffect } from "react";
-import {
-  ADD_NOTIFICATION,
-  SET_UNREAD_COUNT,
-} from "../../store/notificationSlice.ts";
+import { SET_UNREAD_COUNT } from "../../store/notificationSlice.ts";
 import { fetchNotificationUnreadCountService } from "../../services";
 
 export const NotificationHeader = () => {
-  const { user } = useAppSelector((state) => state.auth);
   const { unread_count } = useAppSelector((state) => state.notification);
 
   const dispatch = useAppDispatch();
-
-  const { lastJsonMessage } = useCustomWebsocket(
-    import.meta.env.VITE_WEBSOCKET_URL +
-      `/api/notification/private-notification/${user?.id}`,
-    "Private Notification",
-  );
 
   useEffect(() => {
     async function fetchData() {
@@ -35,12 +21,6 @@ export const NotificationHeader = () => {
 
     fetchData();
   }, [dispatch]);
-
-  useEffect(() => {
-    if (lastJsonMessage !== null) {
-      dispatch(ADD_NOTIFICATION(lastJsonMessage));
-    }
-  }, [dispatch, lastJsonMessage]);
 
   return (
     <div>

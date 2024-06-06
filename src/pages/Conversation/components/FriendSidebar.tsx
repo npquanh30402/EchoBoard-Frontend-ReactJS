@@ -1,27 +1,51 @@
 import { FriendItem } from "./FriendItem.tsx";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchFriendService } from "../../../services";
 import { SET_FRIEND_LIST } from "../../../store/friendSlice.ts";
 
 export const FriendSidebar = () => {
-  const { friendList } = useAppSelector((state) => state.friend);
+  const { user } = useAppSelector((state) => state.auth);
+  const { friendList, fetchCursors, isFinished } = useAppSelector(
+    (state) => state.friend,
+  );
   const dispatch = useAppDispatch();
+  const [hasMore, setHasMore] = useState(true);
+
+  const friendListCursor = fetchCursors["friendList"];
+  const friendListIsFinished = isFinished["friendList"];
+
+  async function fetchFriend() {
+    if (friendListIsFinished) return;
+    const formData = {
+      cursor: friendListCursor,
+    };
+
+    const response = await fetchFriendService(formData);
+    if (response) {
+      dispatch(SET_FRIEND_LIST(response));
+      setHasMore(response.length > 0);
+    }
+  }
 
   useEffect(() => {
-    async function fetchFriend() {
-      const response = await fetchFriendService(1, 10);
-      if (response) {
-        dispatch(SET_FRIEND_LIST(response));
+    fetchFriend();
+  }, []);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+          document.documentElement.offsetHeight - 5 &&
+        hasMore
+      ) {
+        fetchFriend();
       }
     }
 
-    fetchFriend();
-
-    // if (friendList?.length === 0) {
-    //   fetchFriend();
-    // }
-  }, [dispatch]);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [fetchFriend, hasMore]);
 
   return (
     <div>
@@ -43,11 +67,14 @@ export const FriendSidebar = () => {
           ></label>
           <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content gap-2">
             {friendList &&
-              friendList.map((friend) => (
-                <li key={friend.id}>
-                  <FriendItem friend={friend} />
-                </li>
-              ))}
+              friendList.map(
+                (friend) =>
+                  user?.id !== friend.id && (
+                    <li key={friend.id}>
+                      <FriendItem friend={friend} />
+                    </li>
+                  ),
+              )}
           </ul>
         </div>
       </div>
