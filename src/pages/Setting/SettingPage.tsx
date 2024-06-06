@@ -1,4 +1,9 @@
-import { useAppDispatch, useAppSelector, useDocumentTitle } from "../../hooks";
+import {
+  useAppDispatch,
+  useAppSelector,
+  useCustomWebsocket,
+  useDocumentTitle,
+} from "../../hooks";
 import React, { useState } from "react";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { PROFILE } from "../../store/authSlice.ts";
@@ -20,6 +25,12 @@ export const SettingPage = () => {
     fullName: profile?.fullName || "",
     bio: profile?.bio || "",
   });
+
+  const { sendJsonMessage } = useCustomWebsocket(
+    import.meta.env.VITE_WEBSOCKET_URL +
+      "/api/notification/central-notification",
+    "Central Notification",
+  );
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -85,6 +96,16 @@ export const SettingPage = () => {
     if (data) {
       toast.success("Updated successfully!");
       dispatch(PROFILE(data));
+
+      sendJsonMessage({
+        type: "account_activity",
+        content: `You have updated your profile`,
+        metadata: {
+          from: user?.username,
+          related_id: user?.id,
+        },
+        receiverId: profile?.id as string,
+      });
     }
   };
 

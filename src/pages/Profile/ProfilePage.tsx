@@ -79,19 +79,19 @@ export const ProfilePage = () => {
     switch (friendshipStatus) {
       case "pending":
         return (
-          <button className="btn btn-outline btn-secondary" disabled>
+          <button className="btn btn-outline btn-secondary opacity-50 cursor-not-allowed">
             Friend Request Pending
           </button>
         );
       case "accepted":
         return (
-          <button className="btn btn-outline btn-success" disabled>
+          <button className="btn btn-outline btn-success opacity-50 cursor-not-allowed">
             Already Friends
           </button>
         );
       case "rejected":
         return (
-          <button className="btn btn-outline btn-error" disabled>
+          <button className="btn btn-outline btn-error opacity-50 cursor-not-allowed">
             Friend Request Rejected
           </button>
         );
@@ -127,7 +127,7 @@ export const ProfilePage = () => {
               <p>{profile?.fullName}</p>
               <div className="card-actions">
                 <button className="btn btn-primary">Follow</button>
-                {renderButton()}
+                {user?.id !== profile.id && renderButton()}
                 {/*<button className="btn btn-primary">Message</button>*/}
               </div>
               <hr className={"text-white w-full mt-6"} />

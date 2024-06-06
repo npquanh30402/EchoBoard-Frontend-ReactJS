@@ -40,13 +40,10 @@ export const DropDownProfile = () => {
           {user ? (
             <>
               <li className={"border-b mb-2 py-2"}>
-                <Link to={RouteEnum.PROFILE}>{user.username}</Link>
+                <a>{user.username}</a>
               </li>
               <li>
                 <Link to={RouteEnum.FRIEND}>Friends</Link>
-              </li>
-              <li>
-                <Link to={RouteEnum.CONVERSATION}>Chat</Link>
               </li>
               <li>
                 <Link to={RouteEnum.SETTINGS}>Settings</Link>

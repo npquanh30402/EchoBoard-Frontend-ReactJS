@@ -3,12 +3,15 @@ import { useAppDispatch } from "../../../hooks";
 import { MARK_READ_NOTIFICATION } from "../../../store/notificationSlice.ts";
 import { markNotificationAsReadService } from "../../../services";
 import { toast } from "react-toastify";
+import { formatDistanceToNow } from "date-fns";
+import { useEffect, useState } from "react";
 
 export const NotificationItem = ({
   notification,
 }: {
   notification: NotificationInterface;
 }) => {
+  const [dateCreated, setDateCreated] = useState<string>();
   const dispatch = useAppDispatch();
 
   async function markAsRead() {
@@ -20,25 +23,55 @@ export const NotificationItem = ({
     }
   }
 
+  const notificationStyles: {
+    [key: string]: {
+      alertClass: string;
+      iconClass: string;
+    };
+  } = {
+    friend_request: {
+      alertClass: "",
+      iconClass: "bi bi-person-add",
+    },
+    account_activity: {
+      alertClass: "alert-warning",
+      iconClass: "bi bi-exclamation-diamond",
+    },
+    default: {
+      alertClass: "",
+      iconClass: "bi bi-bell",
+    },
+  };
+
+  console.log(notification.type);
+
+  const { alertClass, iconClass } =
+    notificationStyles[notification.type] || notificationStyles.default;
+
+  useEffect(() => {
+    if (notification.createdAt) {
+      setDateCreated(
+        formatDistanceToNow(new Date(notification.createdAt), {
+          addSuffix: true,
+        }),
+      );
+    }
+  }, [notification.createdAt]);
+
   return (
-    <>
-      <div role="alert" className="alert alert-warning">
-        <i className="bi bi-exclamation-diamond text-xl"></i>
-        <div className={"flex flex-col"}>
-          <span className={"font-bold"}>{notification.content}</span>
-          <span className={"text-sm text-gray-500"}>
-            {!notification.createdAt}
-          </span>
-        </div>
-        <div>
-          {/*<button className="btn btn-sm">Deny</button>*/}
-          {!notification.read && (
-            <button className="btn btn-sm btn-primary" onClick={markAsRead}>
-              Mark as Read
-            </button>
-          )}
-        </div>
+    <div role="alert" className={`alert ${alertClass}`}>
+      <i className={`${iconClass} text-xl`}></i>
+      <div className="flex flex-col">
+        <span className="font-bold">{notification.content}</span>
+        <div className="text-xs">{dateCreated}</div>
       </div>
-    </>
+      <div>
+        {!notification.read && (
+          <button className="btn btn-sm btn-primary" onClick={markAsRead}>
+            Mark as Read
+          </button>
+        )}
+      </div>
+    </div>
   );
 };
