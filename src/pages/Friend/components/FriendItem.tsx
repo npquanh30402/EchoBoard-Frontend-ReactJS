@@ -5,14 +5,16 @@ import { ADD_FRIEND, REMOVE_FRIEND } from "../../../store/friendSlice.ts";
 import {
   useAppDispatch,
   useAppSelector,
-  useCentralNotificationWebSocket,
+  useNotificationWebSocket,
 } from "../../../hooks";
 import {
   acceptFriendRequestService,
+  createConversationService,
   deleteRequestSentService,
 } from "../../../services";
 import { toast } from "react-toastify";
 import { FriendEnum } from "../../../enums";
+import { useFriendWebSocket } from "../../../hooks/useFriendWebSocket.tsx";
 
 export const FriendItem = ({
   friend,
@@ -21,12 +23,13 @@ export const FriendItem = ({
   friend: FriendInterface;
   type: string;
 }) => {
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, profile } = useAppSelector((state) => state.auth);
   const profileImage =
     import.meta.env.VITE_SERVER_URL + "/" + friend?.profilePictureUrl;
   const dispatch = useAppDispatch();
 
-  const { sendNotification } = useCentralNotificationWebSocket();
+  const { sendNotification } = useNotificationWebSocket();
+  const { sendFriendNotice } = useFriendWebSocket();
 
   async function handleAccept() {
     const response = await acceptFriendRequestService(friend.id);
@@ -35,17 +38,30 @@ export const FriendItem = ({
       toast.success("Friend request accepted!");
       dispatch(ADD_FRIEND(friend));
 
-      sendNotification(
-        {
+      sendNotification({
+        notification: {
           type: "friend_request",
           content: `User ${user?.username} has accepted your friend request`,
           metadata: {
-            from: user?.username,
             related_id: user?.id,
           },
+          receiverId: friend?.id as string,
         },
-        friend.id,
-      );
+      });
+
+      sendFriendNotice({
+        friend: {
+          type: "accepted",
+          user: {
+            id: user!.id,
+            fullName: profile?.fullName,
+            username: user!.username,
+            profilePictureUrl: profile?.profilePictureUrl,
+            createdAt: new Date(),
+          },
+          receiverId: friend.id,
+        },
+      });
     }
   }
 
@@ -60,13 +76,43 @@ export const FriendItem = ({
           listName: FriendEnum.RequestSentList,
         }),
       );
+
+      sendFriendNotice({
+        friend: {
+          type: "deleted",
+          user: {
+            id: user!.id,
+            fullName: profile?.fullName,
+            username: user!.username,
+            profilePictureUrl: profile?.profilePictureUrl,
+            createdAt: new Date(),
+          },
+          receiverId: friend.id,
+        },
+      });
+    }
+  }
+
+  async function handleMessage() {
+    const formData = new FormData();
+
+    formData.append("userId", friend.id);
+
+    const response = await createConversationService(formData);
+
+    if (response) {
+      toast.success("You have created a new conversation!");
     }
   }
 
   const renderButton = () => {
     switch (type) {
       case FriendEnum.FriendList:
-        return;
+        return (
+          <button className="btn btn-neutral" onClick={handleMessage}>
+            Message
+          </button>
+        );
       case FriendEnum.FriendRequestList:
         return (
           <>

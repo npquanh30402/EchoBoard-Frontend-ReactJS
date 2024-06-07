@@ -32,9 +32,6 @@ const friendInitialState: FriendStateType = {
 
 // @ts-ignore
 const updateList = (state, action, listName: FriendEnum) => {
-  if (action.payload.length < 10) {
-    state.isFinished[listName] = true;
-  }
   if (action.payload.length > 0) {
     state[listName] = [...state[listName], ...action.payload];
     const lastItem = state[listName][state[listName].length - 1];
@@ -42,6 +39,8 @@ const updateList = (state, action, listName: FriendEnum) => {
       id: lastItem.id,
       createdAt: lastItem.createdAt,
     };
+  } else {
+    state.isFinished[listName] = true;
   }
 };
 
@@ -59,10 +58,35 @@ export const friendSlice = createSlice({
       updateList(state, action, FriendEnum.RequestSentList);
     },
     ADD_FRIEND(state, action) {
-      state.friendList.push(action.payload);
+      const newFriend = action.payload;
+      state.friendList.push(newFriend);
       state.friendRequestList = state.friendRequestList.filter(
-        (friend) => friend.id !== action.payload.id,
+        (friend) => friend.id !== newFriend.id,
       );
+      state.requestSentList = state.requestSentList.filter(
+        (friend) => friend.id !== newFriend.id,
+      );
+
+      if (state.friendList.length > 0) {
+        const lastItem = state.friendList[state.friendList.length - 1];
+        state.fetchCursors[FriendEnum.FriendList] = {
+          id: lastItem.id,
+          createdAt: lastItem.createdAt,
+        };
+      }
+    },
+    ADD_FRIEND_FROM_SEND(state, action) {
+      const newFriend = action.payload;
+      state.friendRequestList.push(newFriend);
+
+      if (state.friendRequestList.length > 0) {
+        const lastItem =
+          state.friendRequestList[state.friendRequestList.length - 1];
+        state.fetchCursors[FriendEnum.FriendRequestList] = {
+          id: lastItem.id,
+          createdAt: lastItem.createdAt,
+        };
+      }
     },
     REMOVE_FRIEND(
       state,
@@ -85,6 +109,7 @@ export const {
   REMOVE_FRIEND,
   SET_FRIEND_REQUEST_LIST,
   SET_REQUEST_SENT_LIST,
+  ADD_FRIEND_FROM_SEND,
 } = friendSlice.actions;
 
 export const friendReducer = friendSlice.reducer;

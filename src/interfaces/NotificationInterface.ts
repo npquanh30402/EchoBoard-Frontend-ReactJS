@@ -1,5 +1,5 @@
 export interface NotificationInterface {
-  id?: string;
+  id: string;
   type: string;
   content: string;
   metadata?: {

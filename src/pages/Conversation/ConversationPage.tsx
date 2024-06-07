@@ -1,5 +1,5 @@
 import { useDocumentTitle } from "../../hooks";
-import { FriendSidebar } from "./components/FriendSidebar.tsx";
+import { ConversationSidebar } from "./components/ConversationSidebar.tsx";
 import { ChatItem } from "./components/ChatItem.tsx";
 
 export const ConversationPage = () => {
@@ -8,7 +8,7 @@ export const ConversationPage = () => {
   return (
     <section id={"conversation"}>
       <div className={"mx-auto rounded-xl flex"}>
-        <FriendSidebar />
+        <ConversationSidebar />
         <ChatItem />
       </div>
     </section>

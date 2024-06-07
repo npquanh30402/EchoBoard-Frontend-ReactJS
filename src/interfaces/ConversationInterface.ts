@@ -1,8 +1,9 @@
 export interface ConversationInterface {
-  id: string;
-  username: string;
-  fullName?: string;
-  message: string;
-  profilePictureUrl: string;
-  date: string;
+  conversationId: string;
+  otherUser: {
+    id: string;
+    username: string;
+    profilePictureUrl?: string;
+  };
+  createdAt: Date;
 }

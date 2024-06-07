@@ -15,3 +15,9 @@ export {
   acceptFriendRequestService,
   deleteRequestSentService,
 } from "./friendService.ts";
+
+export {
+  fetchConversationListService,
+  createConversationService,
+} from "./conversationService.ts";
+export { fetchConversationMessagesService } from "./conversationMessageService.ts";

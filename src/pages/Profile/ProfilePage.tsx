@@ -10,21 +10,23 @@ import { PageNotFound } from "../Other/PageNotFound.tsx";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import {
   useAppSelector,
-  useCentralNotificationWebSocket,
   useDocumentTitle,
+  useNotificationWebSocket,
 } from "../../hooks";
 import { toast } from "react-toastify";
+import { useFriendWebSocket } from "../../hooks/useFriendWebSocket.tsx";
 
 export const ProfilePage = () => {
+  const { user, profile: authProfile } = useAppSelector((state) => state.auth);
   const { id } = useParams();
   const [profile, setProfile] = useState<ProfileInterface | null>(null);
   const picture =
     import.meta.env.VITE_SERVER_URL + "/" + profile?.profilePictureUrl;
-  const { user } = useAppSelector((state) => state.auth);
   const [friendshipStatus, setFriendshipStatus] = useState("none");
 
   useDocumentTitle(`${profile?.username}'s profile`);
-  const { sendNotification } = useCentralNotificationWebSocket();
+  const { sendNotification } = useNotificationWebSocket();
+  const { sendFriendNotice } = useFriendWebSocket();
 
   async function handleSendFriendRequest() {
     const response = await sendFriendRequestService(profile?.id as string);
@@ -34,17 +36,30 @@ export const ProfilePage = () => {
       setFriendshipStatus("pending");
     }
 
-    sendNotification(
-      {
+    sendNotification({
+      notification: {
         type: "friend_request",
         content: `User ${user?.username} has send you a friend request`,
         metadata: {
-          from: user?.username,
           related_id: user?.id,
         },
+        receiverId: profile?.id as string,
       },
-      profile?.id as string,
-    );
+    });
+
+    sendFriendNotice({
+      friend: {
+        type: "send",
+        user: {
+          id: user!.id,
+          fullName: authProfile?.fullName,
+          username: user!.username,
+          profilePictureUrl: authProfile?.profilePictureUrl,
+          createdAt: new Date(),
+        },
+        receiverId: profile!.id,
+      },
+    });
   }
 
   useEffect(() => {

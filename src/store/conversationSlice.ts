@@ -1,54 +1,101 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ConversationInterface, FriendInterface } from "../interfaces";
+import {
+  ConversationInterface,
+  ConversationMessageInterface,
+  CursorSearchInterface,
+} from "../interfaces";
 
 type ConversationStateType = {
-  activeUser: FriendInterface | null;
+  activeConversation: ConversationInterface | null;
   messages: {
-    [id: string]: ConversationInterface[];
+    [id: string]: ConversationMessageInterface[];
   };
   unread_counts: {
     [id: string]: number;
   };
+  fetchCursors: {
+    [id: string]: CursorSearchInterface | undefined;
+  };
+  isFinished: {
+    [id: string]: boolean;
+  };
 };
 
 const conversationInitialState: ConversationStateType = {
-  activeUser: null,
+  activeConversation: null,
   messages: {},
   unread_counts: {},
+  fetchCursors: {},
+  isFinished: {},
 };
 
 export const conversationSlice = createSlice({
   name: "conversation",
   initialState: conversationInitialState,
   reducers: {
-    SET_ACTIVE_USER: (state, action) => {
-      state.activeUser = action.payload;
+    SET_ACTIVE_CONVERSATION: (state, action) => {
+      state.activeConversation = action.payload;
     },
-    ADD_MESSAGE: (state, action) => {
-      const userId = action.payload.userId as string;
-      const sentByCurrentUser = action.payload.sentByCurrentUser;
+    SET_MESSAGES: (state, action) => {
+      const conversationId = action.payload.conversationId;
+      const newMessages = action.payload
+        .message as ConversationMessageInterface[];
 
-      if (state.messages[userId]) {
-        state.messages[userId].push(action.payload.message);
-      } else {
-        state.messages[userId] = [action.payload.message];
+      if (!state.messages[conversationId]) {
+        state.messages[conversationId] = [];
       }
 
+      const existingMessageIds = new Set(
+        state.messages[conversationId].map((msg) => msg.messageId),
+      );
+      state.messages[conversationId] = [
+        ...newMessages.filter((msg) => !existingMessageIds.has(msg.messageId)),
+        ...state.messages[conversationId],
+      ];
+
+      if (newMessages.length > 0) {
+        const firstItem = state.messages[conversationId][0];
+        state.fetchCursors[conversationId] = {
+          id: firstItem.messageId,
+          createdAt: firstItem.createdAt,
+        };
+
+        state.isFinished[conversationId] = false;
+      } else {
+        state.isFinished[conversationId] = true;
+      }
+    },
+    ADD_MESSAGE: (state, action) => {
+      const conversationId = action.payload.conversationId;
+      const newMessage = action.payload.message as ConversationMessageInterface;
+      const sentByCurrentUser = action.payload.sentByCurrentUser;
+
+      if (!state.messages[conversationId]) {
+        state.messages[conversationId] = [];
+      }
+
+      state.messages[conversationId].push(newMessage);
+
       if (!sentByCurrentUser) {
-        state.unread_counts[userId] = (state.unread_counts[userId] || 0) + 1;
+        state.unread_counts[conversationId] =
+          (state.unread_counts[conversationId] || 0) + 1;
       }
     },
     DECREASE_UNREAD_COUNT: (state, action) => {
-      const userId = action.payload;
+      const conversationId = action.payload;
 
-      if (state.unread_counts[userId]) {
-        state.unread_counts[userId] = 0;
+      if (state.unread_counts[conversationId]) {
+        state.unread_counts[conversationId] = 0;
       }
     },
   },
 });
 
-export const { ADD_MESSAGE, SET_ACTIVE_USER, DECREASE_UNREAD_COUNT } =
-  conversationSlice.actions;
+export const {
+  SET_MESSAGES,
+  ADD_MESSAGE,
+  SET_ACTIVE_CONVERSATION,
+  DECREASE_UNREAD_COUNT,
+} = conversationSlice.actions;
 
 export const conversationReducer = conversationSlice.reducer;
