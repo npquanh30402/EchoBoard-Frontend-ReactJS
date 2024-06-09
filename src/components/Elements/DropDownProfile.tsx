@@ -4,18 +4,23 @@ import { LOGOUT } from "../../store/authSlice.ts";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { RouteEnum } from "../../enums";
 import { toast } from "react-toastify";
+import { logoutService } from "../../services";
 
 export const DropDownProfile = () => {
   const { user, profile } = useAppSelector((state) => state.auth);
 
   const profileImage =
-    import.meta.env.VITE_SERVER_URL + "/" + profile?.profilePictureUrl;
+    import.meta.env.VITE_SERVER_URL + "/" + profile?.avatarUrl;
 
   const dispatch = useAppDispatch();
 
   async function handleLogout() {
-    dispatch(LOGOUT());
-    toast.success("Logout Successful!");
+    const response = await logoutService();
+
+    if (response) {
+      dispatch(LOGOUT());
+      toast.success("Logout Successful!");
+    }
   }
 
   return (
@@ -29,7 +34,7 @@ export const DropDownProfile = () => {
           <div className="w-10 rounded-full">
             <img
               alt="Tailwind CSS Navbar component"
-              src={profile?.profilePictureUrl ? profileImage : avatarBackup}
+              src={profile?.avatarUrl ? profileImage : avatarBackup}
             />
           </div>
         </div>

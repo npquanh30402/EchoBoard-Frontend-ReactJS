@@ -3,6 +3,7 @@ import { authReducer } from "./authSlice.ts";
 import { friendReducer } from "./friendSlice.ts";
 import { conversationReducer } from "./conversationSlice.ts";
 import { notificationReducer } from "./notificationSlice.ts";
+import { themeReducer } from "./themeSlice.ts";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     friend: friendReducer,
     conversation: conversationReducer,
     notification: notificationReducer,
+    theme: themeReducer,
   },
 });
 

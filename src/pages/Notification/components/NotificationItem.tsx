@@ -15,10 +15,12 @@ export const NotificationItem = ({
   const dispatch = useAppDispatch();
 
   async function markAsRead() {
-    const response = await markNotificationAsReadService(notification.id!);
+    const response = await markNotificationAsReadService(
+      notification.notificationId!,
+    );
 
     if (response) {
-      dispatch(MARK_READ_NOTIFICATION(notification.id));
+      dispatch(MARK_READ_NOTIFICATION(notification.notificationId));
       toast.success("Notification marked as read!");
     }
   }
@@ -44,7 +46,8 @@ export const NotificationItem = ({
   };
 
   const { alertClass, iconClass } =
-    notificationStyles[notification.type] || notificationStyles.default;
+    notificationStyles[notification.notificationType] ||
+    notificationStyles.default;
 
   useEffect(() => {
     if (notification.createdAt) {
@@ -60,11 +63,11 @@ export const NotificationItem = ({
     <div role="alert" className={`alert ${alertClass}`}>
       <i className={`${iconClass} text-xl`}></i>
       <div className="flex flex-col">
-        <span className="font-bold">{notification.content}</span>
+        <span className="font-bold">{notification.notificationContent}</span>
         <div className="text-xs">{dateCreated}</div>
       </div>
       <div>
-        {!notification.read && (
+        {!notification.isRead && (
           <button className="btn btn-sm btn-primary" onClick={markAsRead}>
             Mark as Read
           </button>

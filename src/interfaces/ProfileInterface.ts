@@ -1,9 +1,9 @@
 export interface ProfileInterface {
-  id: string;
+  userId: string;
   username: string;
-  fullName: string;
-  bio: string;
-  profilePictureUrl: string;
+  fullName?: string | null | undefined;
+  bio?: string | null | undefined;
+  avatarUrl?: string | null | undefined;
   createdAt?: Date;
   updatedAt?: Date;
 }

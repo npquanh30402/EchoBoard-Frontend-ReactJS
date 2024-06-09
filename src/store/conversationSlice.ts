@@ -1,14 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   ConversationInterface,
-  ConversationMessageInterface,
   CursorSearchInterface,
+  MessageInterface,
 } from "../interfaces";
 
 type ConversationStateType = {
   activeConversation: ConversationInterface | null;
   messages: {
-    [id: string]: ConversationMessageInterface[];
+    [id: string]: MessageInterface[];
   };
   unread_counts: {
     [id: string]: number;
@@ -38,8 +38,7 @@ export const conversationSlice = createSlice({
     },
     SET_MESSAGES: (state, action) => {
       const conversationId = action.payload.conversationId;
-      const newMessages = action.payload
-        .message as ConversationMessageInterface[];
+      const newMessages = action.payload.message as MessageInterface[];
 
       if (!state.messages[conversationId]) {
         state.messages[conversationId] = [];
@@ -67,7 +66,7 @@ export const conversationSlice = createSlice({
     },
     ADD_MESSAGE: (state, action) => {
       const conversationId = action.payload.conversationId;
-      const newMessage = action.payload.message as ConversationMessageInterface;
+      const newMessage = action.payload.message as MessageInterface;
       const sentByCurrentUser = action.payload.sentByCurrentUser;
 
       if (!state.messages[conversationId]) {

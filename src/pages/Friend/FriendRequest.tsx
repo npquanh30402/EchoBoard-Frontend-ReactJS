@@ -55,7 +55,7 @@ export const FriendRequest = () => {
         {friendRequestList &&
           friendRequestList.map((friend) => (
             <FriendItem
-              key={friend.id}
+              key={friend.friendId}
               friend={friend}
               type={FriendEnum.FriendRequestList}
             />

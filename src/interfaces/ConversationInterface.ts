@@ -1,9 +1,9 @@
 export interface ConversationInterface {
   conversationId: string;
   otherUser: {
-    id: string;
+    userId: string;
     username: string;
-    profilePictureUrl?: string;
+    avatarUrl?: string;
   };
   createdAt: Date;
 }

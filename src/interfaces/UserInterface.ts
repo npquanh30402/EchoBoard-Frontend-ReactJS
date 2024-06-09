@@ -1,8 +1,8 @@
 export interface UserInterface {
-  id: string;
+  userId: string;
   username: string;
   email: string;
-  emailVerified?: Date;
+  emailVerified?: Date | null | undefined;
   isAdmin?: boolean;
   createdAt?: Date;
   updatedAt?: Date;

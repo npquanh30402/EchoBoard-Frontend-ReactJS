@@ -1,20 +1,18 @@
-import { FriendInterface } from "../../../interfaces";
+import { ConversationInterface, FriendInterface } from "../../../interfaces";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ADD_FRIEND, REMOVE_FRIEND } from "../../../store/friendSlice.ts";
-import {
-  useAppDispatch,
-  useAppSelector,
-  useNotificationWebSocket,
-} from "../../../hooks";
+import { useAppDispatch } from "../../../hooks";
 import {
   acceptFriendRequestService,
   createConversationService,
   deleteRequestSentService,
+  fetchAConversationService,
+  rejectFriendRequestService,
 } from "../../../services";
 import { toast } from "react-toastify";
 import { FriendEnum } from "../../../enums";
-import { useFriendWebSocket } from "../../../hooks/useFriendWebSocket.tsx";
+import { SET_ACTIVE_CONVERSATION } from "../../../store/conversationSlice.ts";
 
 export const FriendItem = ({
   friend,
@@ -23,50 +21,50 @@ export const FriendItem = ({
   friend: FriendInterface;
   type: string;
 }) => {
-  const { user, profile } = useAppSelector((state) => state.auth);
   const profileImage =
-    import.meta.env.VITE_SERVER_URL + "/" + friend?.profilePictureUrl;
+    import.meta.env.VITE_SERVER_URL + "/" + friend?.avatarUrl;
   const dispatch = useAppDispatch();
-
-  const { sendNotification } = useNotificationWebSocket();
-  const { sendFriendNotice } = useFriendWebSocket();
+  const navigate = useNavigate();
 
   async function handleAccept() {
-    const response = await acceptFriendRequestService(friend.id);
+    const response = await acceptFriendRequestService(friend.userId);
 
     if (response) {
       toast.success("Friend request accepted!");
-      dispatch(ADD_FRIEND(friend));
 
-      sendNotification({
-        notification: {
-          type: "friend_request",
-          content: `User ${user?.username} has accepted your friend request`,
-          metadata: {
-            related_id: user?.id,
-          },
-          receiverId: friend?.id as string,
-        },
-      });
+      dispatch(
+        REMOVE_FRIEND({
+          listName: FriendEnum.FriendRequestList,
+          removedFriend: friend,
+        }),
+      );
 
-      sendFriendNotice({
-        friend: {
-          type: "accepted",
-          user: {
-            id: user!.id,
-            fullName: profile?.fullName,
-            username: user!.username,
-            profilePictureUrl: profile?.profilePictureUrl,
-            createdAt: new Date(),
-          },
-          receiverId: friend.id,
-        },
-      });
+      dispatch(
+        ADD_FRIEND({
+          listName: FriendEnum.AcceptedFriends,
+          newFriend: friend,
+        }),
+      );
+    }
+  }
+
+  async function handleReject() {
+    const response = await rejectFriendRequestService(friend.userId);
+
+    if (response) {
+      toast.success("Friend request accepted!");
+
+      dispatch(
+        REMOVE_FRIEND({
+          listName: FriendEnum.FriendRequestList,
+          removedFriend: friend,
+        }),
+      );
     }
   }
 
   async function handleDelete() {
-    const response = await deleteRequestSentService(friend.id);
+    const response = await deleteRequestSentService(friend.userId);
 
     if (response) {
       toast.success("Your request has been deleted!");
@@ -76,38 +74,33 @@ export const FriendItem = ({
           listName: FriendEnum.RequestSentList,
         }),
       );
-
-      sendFriendNotice({
-        friend: {
-          type: "deleted",
-          user: {
-            id: user!.id,
-            fullName: profile?.fullName,
-            username: user!.username,
-            profilePictureUrl: profile?.profilePictureUrl,
-            createdAt: new Date(),
-          },
-          receiverId: friend.id,
-        },
-      });
     }
   }
 
   async function handleMessage() {
-    const formData = new FormData();
+    const responseFetch = (await fetchAConversationService(
+      friend.userId,
+    )) as ConversationInterface;
 
-    formData.append("userId", friend.id);
+    if (responseFetch.otherUser.userId) {
+      navigate(`/conversation/${responseFetch.conversationId}`);
+      dispatch(SET_ACTIVE_CONVERSATION(responseFetch));
+      return;
+    }
 
-    const response = await createConversationService(formData);
+    const responseCreate = (await createConversationService(
+      friend.userId as string,
+    )) as ConversationInterface;
 
-    if (response) {
-      toast.success("You have created a new conversation!");
+    if (responseCreate) {
+      navigate(`/conversation/${responseCreate.conversationId}`);
+      dispatch(SET_ACTIVE_CONVERSATION(responseCreate));
     }
   }
 
   const renderButton = () => {
     switch (type) {
-      case FriendEnum.FriendList:
+      case FriendEnum.AcceptedFriends:
         return (
           <button className="btn btn-neutral" onClick={handleMessage}>
             Message
@@ -119,7 +112,9 @@ export const FriendItem = ({
             <button className="btn btn-success" onClick={handleAccept}>
               Accept
             </button>
-            <button className="btn btn-error">Deny</button>
+            <button className="btn btn-error" onClick={handleReject}>
+              Deny
+            </button>
           </>
         );
       case FriendEnum.RequestSentList:
@@ -133,12 +128,12 @@ export const FriendItem = ({
 
   return (
     <>
-      <div className="card w-96 bg-neutral text-neutral-content">
+      <div className="card w-96 border border-black dark:border-white">
         <div className="card-body items-center text-center">
           <div className="avatar">
             <div className="w-16 rounded-full">
               <img
-                src={friend.profilePictureUrl ? profileImage : avatarBackup}
+                src={friend.avatarUrl ? profileImage : avatarBackup}
                 alt={""}
               />
             </div>
@@ -146,7 +141,7 @@ export const FriendItem = ({
           <h2 className="card-title">{friend.username}</h2>
           <p>{friend.fullName}</p>
           <div className="card-actions justify-end">
-            <Link to={`/profile/${friend.id}`} className="btn btn-primary">
+            <Link to={`/profile/${friend.userId}`} className="btn btn-primary">
               Profile Page
             </Link>
             {renderButton()}

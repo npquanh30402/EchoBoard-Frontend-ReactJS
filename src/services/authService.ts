@@ -51,7 +51,6 @@ export async function logoutService() {
     );
 
     if (response.status === 200) {
-      toast.success("Logout successfully!");
       return response.data;
     }
   } catch (error) {

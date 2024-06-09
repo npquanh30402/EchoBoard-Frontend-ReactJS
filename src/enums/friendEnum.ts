@@ -1,5 +1,5 @@
 export enum FriendEnum {
-  FriendList = "friendList",
+  AcceptedFriends = "acceptedFriends",
   RequestSentList = "requestSentList",
   FriendRequestList = "friendRequestList",
 }

@@ -2,42 +2,28 @@ import { useCentralWebSocket } from "./useCentralWebSocket.tsx";
 import { useCallback } from "react";
 import { ADD_NOTIFICATION } from "../store/notificationSlice.ts";
 import { useAppDispatch } from "./hooks.ts";
-
-type MessageType = {
-  notification: {
-    type: string;
-    content: string;
-    metadata?: {
-      from?: string | undefined;
-      related_id?: string | undefined;
-      additional_info?: object | null;
-    };
-    receiverId: string;
-  };
-};
+import { NotificationInterface } from "../interfaces";
 
 export const useNotificationWebSocket = () => {
   const dispatch = useAppDispatch();
-  const { sendJsonMessage, lastJsonMessage } = useCentralWebSocket();
 
-  const sendNotification = (message: MessageType) => {
-    sendJsonMessage({
-      action: "message",
-      type: "notification",
-      ...message,
-    });
+  const filter = (msg: MessageEvent<NotificationInterface>) => {
+    const msgObject = JSON.parse(
+      msg.data as unknown as string,
+    ) as NotificationInterface;
+
+    return !!(msgObject && msgObject.notificationId);
   };
+
+  const { lastJsonMessage } = useCentralWebSocket(filter);
 
   const handleIncomingNotification = useCallback(() => {
     if (lastJsonMessage !== null) {
-      const msg = lastJsonMessage as MessageType;
-
-      if (msg.notification) dispatch(ADD_NOTIFICATION(msg.notification));
+      dispatch(ADD_NOTIFICATION(lastJsonMessage));
     }
   }, [dispatch, lastJsonMessage]);
 
   return {
-    sendNotification,
     handleIncomingNotification,
   };
 };

@@ -3,12 +3,12 @@ import {
   DropDownProfile,
   WebSocketInitialization,
 } from "../Elements";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { RouteEnum } from "../../enums";
 import { ThemeToggle } from "../Elements/ThemeToggle.tsx";
 import { NotificationHeader } from "../Elements/NotificationHeader.tsx";
 import { useAppSelector } from "../../hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchModal } from "../Elements/SearchModal.tsx";
 import { ConversationHeader } from "../Elements/ConversationHeader.tsx";
 
@@ -16,9 +16,32 @@ export const Header = () => {
   const { user } = useAppSelector((state) => state.auth);
   const [showModal, setShowModal] = useState(false);
 
+  const [scrollDirection, setScrollDirection] = useState("up");
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY) {
+        setScrollDirection("down");
+      } else {
+        setScrollDirection("up");
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY]);
+
   return (
     <>
-      <header className={"sticky z-10 top-0 navbar bg-base-200 p-6"}>
+      <header
+        className={`sticky z-10 top-0 navbar bg-base-200 p-6 transition duration-300 ease-in-out ${scrollDirection === "down" ? "-translate-y-full" : ""}`}
+      >
         <div className="navbar-start gap-2">
           <DropdownNavbar />
           <Link
@@ -42,6 +65,25 @@ export const Header = () => {
             }
             onClick={() => setShowModal(true)}
           ></button>
+        </div>
+        <div className="navbar-center hidden lg:flex">
+          <ul className="menu menu-horizontal px-1 gap-2">
+            <li>
+              <NavLink to={RouteEnum.HOME}>Homepage</NavLink>
+            </li>
+            <li>
+              <details>
+                <summary>Post</summary>
+                <ul className="p-2">
+                  <li>
+                    <NavLink to={RouteEnum.POST + "/" + RouteEnum.CREATE_POST}>
+                      Create a Post
+                    </NavLink>
+                  </li>
+                </ul>
+              </details>
+            </li>
+          </ul>
         </div>
         <div className="navbar-end flex md:gap-2">
           {user && <ConversationHeader />}

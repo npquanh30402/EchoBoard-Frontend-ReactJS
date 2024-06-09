@@ -1,5 +1,4 @@
 import {
-  ChangeEvent,
   Dispatch,
   FormEvent,
   SetStateAction,
@@ -13,16 +12,11 @@ import { sanitizeAndTrimString } from "../../utils";
 import { UserSearchItem } from "./UserSearchItem.tsx";
 
 export type UserSearchType = {
-  id: string;
+  userId: string;
   username: string;
   fullName: string;
-  profilePictureUrl: string;
+  avatarUrl: string;
   createdAt: Date;
-};
-
-type formSearchType = {
-  searchTerm: string;
-  cursor: CursorSearchInterface;
 };
 
 export const SearchModal = ({
@@ -35,9 +29,13 @@ export const SearchModal = ({
   const [searchResults, setSearchResults] = useState<
     Record<number, UserSearchType[]>
   >({});
+
   const [currentPage, setCurrentPage] = useState(1);
+
   const [searchInput, setSearchInput] = useState("");
+
   const currentSearchTerm = useRef("");
+
   const searchCursor = useRef<CursorSearchInterface | undefined>(undefined);
 
   useEffect(() => {
@@ -60,31 +58,28 @@ export const SearchModal = ({
       setCurrentPage(1);
     }
 
-    const searchParams: Partial<formSearchType> = {
-      searchTerm: sanitizedSearchTerm,
+    const formData = {
       cursor: searchCursor.current,
     };
 
-    const dataResponse: UserSearchType[] =
-      await UserSearchService(searchParams);
+    const response: UserSearchType[] = await UserSearchService(
+      currentSearchTerm.current,
+      formData,
+    );
 
-    if (dataResponse && dataResponse.length > 0) {
-      const lastItem = dataResponse[dataResponse.length - 1];
+    if (response && response.length > 0) {
+      const lastItem = response[response.length - 1];
       searchCursor.current = {
-        id: lastItem.id,
+        id: lastItem.userId,
         createdAt: lastItem.createdAt,
       };
 
       setSearchResults((prevState) => ({
         ...prevState,
-        [pageNumber]: dataResponse,
+        [pageNumber]: response,
       }));
     }
   }
-
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(event.target.value);
-  };
 
   const handlePrevious = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -93,7 +88,7 @@ export const SearchModal = ({
   const handleNext = () => {
     const nextPage = currentPage + 1;
     if (!searchResults[nextPage]) {
-      handleSearch(undefined, nextPage);
+      handleSearch(undefined, nextPage).then();
     }
     setCurrentPage(nextPage);
   };
@@ -117,7 +112,7 @@ export const SearchModal = ({
                 className="grow"
                 name={"searchTerm"}
                 placeholder="Search"
-                onChange={handleInputChange}
+                onChange={(e) => setSearchInput(e.target.value)}
                 value={searchInput}
               />
               <i
@@ -130,7 +125,7 @@ export const SearchModal = ({
             {searchResults[currentPage] &&
               searchResults[currentPage].map((user) => (
                 <UserSearchItem
-                  key={user.id}
+                  key={user.userId}
                   user={user}
                   setShowModal={setShowModal}
                 />

@@ -17,7 +17,7 @@ export const ConversationSidebar = () => {
   }
 
   useEffect(() => {
-    fetchConversations();
+    fetchConversations().then();
   }, []);
 
   return (

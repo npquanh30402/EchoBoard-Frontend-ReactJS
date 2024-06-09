@@ -10,8 +10,7 @@ export const UserSearchItem = ({
   user: UserSearchType;
   setShowModal: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const profileImage =
-    import.meta.env.VITE_SERVER_URL + "/" + user.profilePictureUrl;
+  const profileImage = import.meta.env.VITE_SERVER_URL + "/" + user.avatarUrl;
 
   return (
     <>
@@ -21,7 +20,7 @@ export const UserSearchItem = ({
             <div className="avatar">
               <div className="w-16 rounded-full">
                 <img
-                  src={user.profilePictureUrl ? profileImage : avatarBackup}
+                  src={user.avatarUrl ? profileImage : avatarBackup}
                   alt={`${user.username}'s avatar`}
                 />
               </div>
@@ -35,7 +34,7 @@ export const UserSearchItem = ({
           </div>
           <div>
             <Link
-              to={`/profile/${user.id}`}
+              to={`/profile/${user.userId}`}
               className="btn btn-primary"
               onClick={() => setShowModal(false)}
             >

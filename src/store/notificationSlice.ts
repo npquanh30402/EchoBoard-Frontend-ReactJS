@@ -27,7 +27,7 @@ export const notificationSlice = createSlice({
         state.notifications = [...state.notifications, ...action.payload];
         const lastItem = state.notifications[state.notifications.length - 1];
         state.fetchCursor = {
-          id: lastItem.id!,
+          id: lastItem.notificationId!,
           createdAt: lastItem.createdAt,
         };
       } else {
@@ -39,19 +39,26 @@ export const notificationSlice = createSlice({
       state.unread_count++;
       const lastItem = state.notifications[state.notifications.length - 1];
       state.fetchCursor = {
-        id: lastItem.id!,
+        id: lastItem.notificationId!,
         createdAt: lastItem.createdAt,
       };
     },
     MARK_READ_NOTIFICATION: (state, action) => {
       const notification = state.notifications.find(
-        (notification) => notification.id === action.payload,
+        (notification) => notification.notificationId === action.payload,
       );
       if (notification) {
-        notification.read = true;
+        notification.isRead = true;
       }
 
       state.unread_count--;
+    },
+    MARK_ALL_NOTIFICATION_AS_READ: (state) => {
+      state.notifications.forEach((notification) => {
+        notification.isRead = true;
+      });
+
+      state.unread_count = 0;
     },
   },
 });
@@ -61,6 +68,7 @@ export const {
   MARK_READ_NOTIFICATION,
   ADD_NOTIFICATION,
   SET_UNREAD_COUNT,
+  MARK_ALL_NOTIFICATION_AS_READ,
 } = notificationSlice.actions;
 
 export const notificationReducer = notificationSlice.reducer;

@@ -1,59 +1,73 @@
 import { useCentralWebSocket } from "./useCentralWebSocket.tsx";
 import { useCallback } from "react";
-import { useAppDispatch } from "./hooks.ts";
-import {
-  ADD_FRIEND,
-  ADD_FRIEND_FROM_SEND,
-  REMOVE_FRIEND,
-} from "../store/friendSlice.ts";
 import { FriendInterface } from "../interfaces";
+import { useAppDispatch } from "./hooks.ts";
+import { ADD_FRIEND, REMOVE_FRIEND } from "../store/friendSlice.ts";
 import { FriendEnum } from "../enums";
-
-type MessageType = {
-  friend: {
-    type: string;
-    user: FriendInterface;
-    receiverId: string;
-  };
-};
 
 export const useFriendWebSocket = () => {
   const dispatch = useAppDispatch();
-  const { sendJsonMessage, lastJsonMessage } = useCentralWebSocket();
 
-  const sendFriendNotice = (message: MessageType) => {
-    sendJsonMessage({
-      action: "message",
-      type: "friend",
-      ...message,
-    });
+  const filter = (msg: MessageEvent<FriendInterface>) => {
+    const msgObject = JSON.parse(
+      msg.data as unknown as string,
+    ) as FriendInterface;
+
+    return !!(msgObject && msgObject.friendId);
   };
+
+  const { lastJsonMessage } = useCentralWebSocket(filter);
 
   const handleIncomingFriendNotice = useCallback(() => {
     if (lastJsonMessage !== null) {
-      const msg = lastJsonMessage as MessageType;
+      const msg = lastJsonMessage as FriendInterface;
 
-      if (msg.friend && msg.friend.type === "send") {
-        dispatch(ADD_FRIEND_FROM_SEND(msg.friend.user));
+      if (msg.friendStatus === "pending") {
+        dispatch(
+          ADD_FRIEND({
+            newFriend: msg,
+            listName: FriendEnum.FriendRequestList,
+          }),
+        );
       }
 
-      if (msg.friend && msg.friend.type === "accepted") {
-        dispatch(ADD_FRIEND(msg.friend.user));
-      }
+      if (msg.friendStatus === "accepted") {
+        dispatch(
+          ADD_FRIEND({
+            newFriend: msg,
+            listName: FriendEnum.AcceptedFriends,
+          }),
+        );
 
-      if (msg.friend && msg.friend.type === "deleted") {
         dispatch(
           REMOVE_FRIEND({
-            removedFriend: msg.friend.user,
+            removedFriend: msg,
+            listName: FriendEnum.RequestSentList,
+          }),
+        );
+      }
+
+      if (msg.friendStatus === "rejected") {
+        dispatch(
+          REMOVE_FRIEND({
+            removedFriend: msg,
+            listName: FriendEnum.FriendRequestList,
+          }),
+        );
+      }
+
+      if (msg.friendStatus === "deleted") {
+        dispatch(
+          REMOVE_FRIEND({
+            removedFriend: msg,
             listName: FriendEnum.FriendRequestList,
           }),
         );
       }
     }
-  }, [dispatch, lastJsonMessage]);
+  }, [lastJsonMessage]);
 
   return {
-    sendFriendNotice,
     handleIncomingFriendNotice,
   };
 };

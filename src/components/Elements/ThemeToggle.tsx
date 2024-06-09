@@ -1,23 +1,25 @@
 import { Theme } from "../../enums";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { SET_THEME } from "../../store/themeSlice.ts";
 
 export const ThemeToggle = () => {
-  const [theme, setTheme] = useState(
-    localStorage.getItem("theme") || Theme.DARK,
-  );
+  const { theme } = useAppSelector((state) => state.theme);
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    document.documentElement.setAttribute("class", theme);
+    document.documentElement.setAttribute("data-theme", theme as string);
+    document.documentElement.setAttribute("class", theme as string);
   }, [theme]);
 
   const toggleTheme = () => {
     if (theme === Theme.DARK) {
-      setTheme(Theme.LIGHT);
       localStorage.setItem("theme", Theme.LIGHT);
+      dispatch(SET_THEME(Theme.LIGHT));
     } else {
-      setTheme(Theme.DARK);
       localStorage.setItem("theme", Theme.DARK);
+      dispatch(SET_THEME(Theme.DARK));
     }
   };
 

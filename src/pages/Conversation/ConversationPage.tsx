@@ -1,6 +1,6 @@
 import { useDocumentTitle } from "../../hooks";
 import { ConversationSidebar } from "./components/ConversationSidebar.tsx";
-import { ChatItem } from "./components/ChatItem.tsx";
+import { Outlet } from "react-router-dom";
 
 export const ConversationPage = () => {
   useDocumentTitle("Conversation");
@@ -9,7 +9,7 @@ export const ConversationPage = () => {
     <section id={"conversation"}>
       <div className={"mx-auto rounded-xl flex"}>
         <ConversationSidebar />
-        <ChatItem />
+        <Outlet />
       </div>
     </section>
   );

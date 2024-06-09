@@ -13,6 +13,8 @@ export { SettingPage } from "./Setting/SettingPage.tsx";
 export {
   FriendPage,
   SentRequest,
-  AllFriends,
+  AcceptedFriends,
   FriendRequest,
 } from "./Friend/index.tsx";
+
+export { CreatePostPage } from "./Post/CreatePostPage.tsx";

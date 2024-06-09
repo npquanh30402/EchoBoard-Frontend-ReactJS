@@ -3,7 +3,7 @@ import { ProfileInterface, UserInterface } from "../interfaces";
 
 type AuthStateType = {
   user: UserInterface | null;
-  profile?: ProfileInterface | null;
+  profile: ProfileInterface | null;
 };
 
 const authInitialState: AuthStateType = {

@@ -1,6 +1,8 @@
 import useWebSocket from "react-use-websocket";
 
-export const useCentralWebSocket = () => {
+export const useCentralWebSocket = (
+  filter?: (msg: MessageEvent) => boolean,
+) => {
   const { lastJsonMessage, sendJsonMessage } = useWebSocket(
     import.meta.env.VITE_WEBSOCKET_URL + "/ws",
     {
@@ -10,6 +12,7 @@ export const useCentralWebSocket = () => {
       // onMessage: (msg) => console.log(JSON.parse(msg.data)),
       shouldReconnect: () => true,
       retryOnError: true,
+      filter,
     },
   );
 

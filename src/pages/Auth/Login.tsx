@@ -45,7 +45,7 @@ export const Login = () => {
     if (data) {
       dispatch(LOGIN(data));
 
-      const profileData = await fetchProfileService(data.id);
+      const profileData = await fetchProfileService(data.userId);
 
       dispatch(PROFILE(profileData));
 

@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { RouterProvider } from "react-router-dom";
 import { Router } from "./routes/Router.tsx";
 import { ToastContainer } from "react-toastify";
+import "@mdxeditor/editor/style.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <>

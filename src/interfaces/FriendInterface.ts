@@ -1,7 +1,10 @@
 export interface FriendInterface {
-  id: string;
+  friendId: string;
+  friendStatus: string;
+  userId: string;
   username: string;
-  fullName?: string;
-  profilePictureUrl?: string;
+  fullName?: string | null | undefined;
+  avatarUrl?: string | null | undefined;
   createdAt?: Date;
+  updatedAt?: Date;
 }

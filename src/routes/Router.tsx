@@ -1,9 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App.tsx";
 import {
+  AcceptedFriends,
   AdminPage,
-  AllFriends,
   ConversationPage,
+  CreatePostPage,
   FriendPage,
   FriendRequest,
   Homepage,
@@ -18,6 +19,9 @@ import {
 import { AdminProtectedRoute } from "./AdminProtectedRoute.tsx";
 import { RouteEnum } from "../enums";
 import { AuthProtectedRoute } from "./AuthProtectedRoute.tsx";
+import { ChatItem } from "../pages/Conversation/components/ChatItem.tsx";
+import { PostPage } from "../pages/Post/PostPage.tsx";
+import { ViewPostPage } from "../pages/Post/ViewPostPage.tsx";
 
 export const Router = createBrowserRouter([
   {
@@ -38,6 +42,24 @@ export const Router = createBrowserRouter([
       {
         path: RouteEnum.FORGOT_PASSWORD,
         element: <Homepage />,
+      },
+      {
+        path: RouteEnum.POST,
+        element: (
+          <AuthProtectedRoute>
+            <PostPage />
+          </AuthProtectedRoute>
+        ),
+        children: [
+          {
+            path: RouteEnum.CREATE_POST,
+            element: <CreatePostPage />,
+          },
+          {
+            path: ":postId",
+            element: <ViewPostPage />,
+          },
+        ],
       },
       {
         path: RouteEnum.NOTIFICATION,
@@ -65,7 +87,7 @@ export const Router = createBrowserRouter([
         children: [
           {
             path: RouteEnum.All_FRIEND,
-            element: <AllFriends />,
+            element: <AcceptedFriends />,
           },
           {
             path: RouteEnum.FRIEND_REQUEST,
@@ -92,6 +114,12 @@ export const Router = createBrowserRouter([
             <ConversationPage />
           </AuthProtectedRoute>
         ),
+        children: [
+          {
+            path: ":conversationId",
+            element: <ChatItem />,
+          },
+        ],
       },
       {
         path: RouteEnum.SETTINGS,

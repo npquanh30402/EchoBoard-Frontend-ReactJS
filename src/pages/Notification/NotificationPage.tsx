@@ -1,26 +1,27 @@
 import { useAppDispatch, useAppSelector, useDocumentTitle } from "../../hooks";
 import { NotificationItem } from "./components/NotificationItem.tsx";
-import { useEffect, useState } from "react";
-import { SET_NOTIFICATIONS } from "../../store/notificationSlice.ts";
-import { fetchNotificationListService } from "../../services";
+import { useCallback, useEffect } from "react";
+import {
+  MARK_ALL_NOTIFICATION_AS_READ,
+  SET_NOTIFICATIONS,
+} from "../../store/notificationSlice.ts";
+import {
+  fetchNotificationListService,
+  markAllNotificationAsReadService,
+} from "../../services";
+import { toast } from "react-toastify";
 
 export const NotificationPage = () => {
   useDocumentTitle("Notifications");
-  const { notifications, fetchCursor, isFinished } = useAppSelector(
-    (state) => state.notification,
-  );
+
+  const { notifications, unread_count, fetchCursor, isFinished } =
+    useAppSelector((state) => state.notification);
+
   const dispatch = useAppDispatch();
 
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  async function fetchData() {
+  const fetchNotificationList = useCallback(async () => {
     if (isFinished) return;
-    setLoading(true);
+
     const formData = {
       cursor: fetchCursor,
     };
@@ -29,38 +30,58 @@ export const NotificationPage = () => {
 
     if (response) {
       dispatch(SET_NOTIFICATIONS(response));
-      setHasMore(response.length > 0);
-      setLoading(false);
     }
-  }
+  }, [dispatch, fetchCursor]);
+
+  useEffect(() => {
+    fetchNotificationList().then();
+  }, []);
 
   useEffect(() => {
     function handleScroll() {
       if (
         window.innerHeight + document.documentElement.scrollTop >=
           document.documentElement.offsetHeight - 5 &&
-        !loading &&
-        hasMore
+        !isFinished
       ) {
-        fetchData();
+        fetchNotificationList().then();
       }
     }
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [fetchData, hasMore, loading]);
+  }, [fetchNotificationList, isFinished]);
+
+  async function handleMarkAllAsRead() {
+    const response = await markAllNotificationAsReadService();
+
+    if (response) {
+      toast.success("All notifications marked as read!");
+      dispatch(MARK_ALL_NOTIFICATION_AS_READ());
+    }
+  }
 
   return (
     <section id={"notifications"}>
-      <div className={"mx-4 flex flex-col gap-2 my-4 items-center"}>
-        <h1 className={"font-bold text-2xl underline underline-offset-8 mb-6"}>
-          Notifications
-        </h1>
+      <div className={"mx-4 flex flex-col gap-2 my-8 items-center"}>
+        <div className="flex justify-between md:justify-center w-full items-center mb-6">
+          <div className="md:flex-grow text-center">
+            <h1 className="font-bold underline underline-offset-8">
+              Notifications
+            </h1>
+          </div>
+          {unread_count > 1 && (
+            <button className="btn btn-outline" onClick={handleMarkAllAsRead}>
+              Mark all as read
+            </button>
+          )}
+        </div>
+
         {notifications.length > 0 &&
           notifications.map((notification) => (
             <NotificationItem
               notification={notification}
-              key={notification.id}
+              key={notification.notificationId}
             />
           ))}
       </div>

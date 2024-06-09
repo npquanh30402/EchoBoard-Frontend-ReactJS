@@ -6,6 +6,7 @@ import {
   SET_ACTIVE_CONVERSATION,
 } from "../../../store/conversationSlice.ts";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const ConversationItem = ({
   convo,
@@ -14,11 +15,13 @@ export const ConversationItem = ({
 }) => {
   const { unread_counts } = useAppSelector((state) => state.conversation);
   const profileImage =
-    import.meta.env.VITE_SERVER_URL + "/" + convo?.otherUser.profilePictureUrl;
+    import.meta.env.VITE_SERVER_URL + "/" + convo?.otherUser.avatarUrl;
 
   const { activeConversation } = useAppSelector((state) => state.conversation);
 
   const dispatch = useAppDispatch();
+
+  const navigate = useNavigate();
 
   const [isActive, setIsActive] = useState(false);
 
@@ -33,6 +36,8 @@ export const ConversationItem = ({
   function handleRequestChat() {
     dispatch(SET_ACTIVE_CONVERSATION(convo));
     dispatch(DECREASE_UNREAD_COUNT(convo.conversationId));
+
+    navigate(`${convo.conversationId}`);
   }
 
   return (
@@ -45,11 +50,7 @@ export const ConversationItem = ({
           <div className="avatar">
             <div className="w-12 rounded-full">
               <img
-                src={
-                  convo.otherUser.profilePictureUrl
-                    ? profileImage
-                    : avatarBackup
-                }
+                src={convo.otherUser.avatarUrl ? profileImage : avatarBackup}
                 alt={""}
               />
             </div>

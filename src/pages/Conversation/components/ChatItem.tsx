@@ -6,19 +6,17 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  useAppDispatch,
-  useAppSelector,
-  useConversationMessageWebSocket,
-} from "../../../hooks";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { ChatLeft } from "./ChatLeft.tsx";
 import { ChatRight } from "./ChatRight.tsx";
 import { SET_MESSAGES } from "../../../store/conversationSlice.ts";
-import { fetchConversationMessagesService } from "../../../services";
 import { sanitizeAndTrimString } from "../../../utils";
+import { fetchMessagesService, storeMessagesService } from "../../../services";
 
 export const ChatItem = () => {
-  const { user, profile } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
+
+  // const { conversationId } = useParams();
 
   const { activeConversation, messages, fetchCursors, isFinished } =
     useAppSelector((state) => state.conversation);
@@ -44,7 +42,7 @@ export const ChatItem = () => {
       cursor: conversationFetchCursor,
     };
 
-    const response = await fetchConversationMessagesService(
+    const response = await fetchMessagesService(
       activeConversation?.conversationId as string,
       formData,
     );
@@ -66,7 +64,7 @@ export const ChatItem = () => {
 
   useEffect(() => {
     fetchMessages().then(() => scrollToBottom());
-  }, [activeConversation]);
+  }, [activeConversation, fetchMessages]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -76,24 +74,16 @@ export const ChatItem = () => {
     });
   };
 
-  const { sendMessage } = useConversationMessageWebSocket();
-
-  const handleClickSendMessage = (evt: FormEvent<HTMLFormElement>) => {
+  const handleClickSendMessage = async (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
 
     if (formData.message.length > 0) {
-      sendMessage({
-        conversation_message: {
-          conversationId: activeConversation?.conversationId as string,
-          messageText: sanitizeAndTrimString(formData.message),
-          sender: {
-            id: user!.id as string,
-            username: user!.username as string,
-            profilePictureUrl: profile?.profilePictureUrl as string,
-          },
-          receiverId: activeConversation?.otherUser.id as string,
-        },
-      });
+      const data = {
+        conversationId: activeConversation?.conversationId as string,
+        messageContent: sanitizeAndTrimString(formData.message),
+        receiverId: activeConversation?.otherUser.userId as string,
+      };
+      await storeMessagesService(data);
 
       setFormData({
         message: "",
@@ -141,7 +131,7 @@ export const ChatItem = () => {
 
   useEffect(() => {
     if (userMessages && userMessages.length > 0) {
-      if (userMessages[userMessages.length - 1].sender.id === user?.id)
+      if (userMessages[userMessages.length - 1].sender.userId === user?.userId)
         scrollToBottom();
     }
   }, [user, userMessages]);
@@ -155,7 +145,7 @@ export const ChatItem = () => {
       >
         {userMessages &&
           userMessages.map((message) => {
-            if (message.sender.id === user?.id) {
+            if (message.sender.userId === user?.userId) {
               return <ChatLeft message={message} key={message.messageId} />;
             } else {
               return <ChatRight message={message} key={message.messageId} />;

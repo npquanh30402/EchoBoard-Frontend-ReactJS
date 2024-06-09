@@ -1,37 +1,36 @@
 import { useAppDispatch, useAppSelector } from "../../hooks";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { fetchFriendService } from "../../services";
-import { SET_FRIEND_LIST } from "../../store/friendSlice.ts";
+import { SET_ACCEPTED_FRIENDS } from "../../store/friendSlice.ts";
 import { FriendItem } from "./components/FriendItem.tsx";
 import { FriendEnum } from "../../enums";
 
-export const AllFriends = () => {
-  const { friendList, fetchCursors, isFinished } = useAppSelector(
+export const AcceptedFriends = () => {
+  const { acceptedFriends, fetchCursors, isFinished } = useAppSelector(
     (state) => state.friend,
   );
+
   const dispatch = useAppDispatch();
-  const [hasMore, setHasMore] = useState(true);
 
-  const friendListCursor = fetchCursors[FriendEnum.FriendList];
-  const friendListIsFinished = isFinished[FriendEnum.FriendList];
+  const acceptedFriendsCursor = fetchCursors[FriendEnum.AcceptedFriends];
+  const acceptedFriendsIsFinished = isFinished[FriendEnum.AcceptedFriends];
 
-  async function fetchFriend() {
-    if (friendListIsFinished) return;
+  const fetchFriend = useCallback(async () => {
+    if (acceptedFriendsIsFinished) return;
 
     const formData = {
-      cursor: friendListCursor,
+      cursor: acceptedFriendsCursor,
     };
 
     const response = await fetchFriendService(formData);
 
     if (response) {
-      dispatch(SET_FRIEND_LIST(response));
-      setHasMore(response.length > 0);
+      dispatch(SET_ACCEPTED_FRIENDS(response));
     }
-  }
+  }, [acceptedFriendsCursor, dispatch]);
 
   useEffect(() => {
-    fetchFriend();
+    fetchFriend().then();
   }, []);
 
   useEffect(() => {
@@ -39,25 +38,25 @@ export const AllFriends = () => {
       if (
         window.innerHeight + document.documentElement.scrollTop >=
           document.documentElement.offsetHeight - 5 &&
-        friendListIsFinished
+        !acceptedFriendsIsFinished
       ) {
-        fetchFriend();
+        fetchFriend().then();
       }
     }
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [fetchFriend, hasMore]);
+  }, [fetchFriend, acceptedFriendsIsFinished]);
 
   return (
     <>
       <div className={"flex flex-wrap gap-4 justify-center"}>
-        {friendList &&
-          friendList.map((friend) => (
+        {acceptedFriends &&
+          acceptedFriends.map((friend) => (
             <FriendItem
-              key={friend.id}
+              key={friend.friendId}
               friend={friend}
-              type={FriendEnum.FriendList}
+              type={FriendEnum.AcceptedFriends}
             />
           ))}
       </div>

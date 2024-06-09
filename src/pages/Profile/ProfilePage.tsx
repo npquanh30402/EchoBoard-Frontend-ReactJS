@@ -8,58 +8,36 @@ import {
 import { ProfileInterface } from "../../interfaces";
 import { PageNotFound } from "../Other/PageNotFound.tsx";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
-import {
-  useAppSelector,
-  useDocumentTitle,
-  useNotificationWebSocket,
-} from "../../hooks";
+import { useAppDispatch, useAppSelector, useDocumentTitle } from "../../hooks";
 import { toast } from "react-toastify";
-import { useFriendWebSocket } from "../../hooks/useFriendWebSocket.tsx";
+import { ADD_FRIEND } from "../../store/friendSlice.ts";
+import { FriendEnum } from "../../enums";
 
 export const ProfilePage = () => {
-  const { user, profile: authProfile } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
   const { id } = useParams();
   const [profile, setProfile] = useState<ProfileInterface | null>(null);
-  const picture =
-    import.meta.env.VITE_SERVER_URL + "/" + profile?.profilePictureUrl;
+  const picture = import.meta.env.VITE_SERVER_URL + "/" + profile?.avatarUrl;
   const [friendshipStatus, setFriendshipStatus] = useState("none");
 
   useDocumentTitle(`${profile?.username}'s profile`);
-  const { sendNotification } = useNotificationWebSocket();
-  const { sendFriendNotice } = useFriendWebSocket();
+
+  const dispatch = useAppDispatch();
 
   async function handleSendFriendRequest() {
-    const response = await sendFriendRequestService(profile?.id as string);
+    const response = await sendFriendRequestService(profile?.userId as string);
 
     if (response) {
       toast.success("Friend request sent successfully!");
       setFriendshipStatus("pending");
+
+      dispatch(
+        ADD_FRIEND({
+          newFriend: response,
+          listName: FriendEnum.RequestSentList,
+        }),
+      );
     }
-
-    sendNotification({
-      notification: {
-        type: "friend_request",
-        content: `User ${user?.username} has send you a friend request`,
-        metadata: {
-          related_id: user?.id,
-        },
-        receiverId: profile?.id as string,
-      },
-    });
-
-    sendFriendNotice({
-      friend: {
-        type: "send",
-        user: {
-          id: user!.id,
-          fullName: authProfile?.fullName,
-          username: user!.username,
-          profilePictureUrl: authProfile?.profilePictureUrl,
-          createdAt: new Date(),
-        },
-        receiverId: profile!.id,
-      },
-    });
   }
 
   useEffect(() => {
@@ -83,8 +61,8 @@ export const ProfilePage = () => {
       }
     }
 
-    fetchProfile();
-    fetchFriendshipStatus();
+    fetchProfile().then();
+    fetchFriendshipStatus().then();
   }, [id]);
 
   const renderButton = () => {
@@ -129,7 +107,7 @@ export const ProfilePage = () => {
             <div className="avatar">
               <div className="w-28 rounded-full">
                 <img
-                  src={profile?.profilePictureUrl ? picture : avatarBackup}
+                  src={profile?.avatarUrl ? picture : avatarBackup}
                   alt={`${profile?.username}'s avatar`}
                 />
               </div>
@@ -139,7 +117,7 @@ export const ProfilePage = () => {
               <p>{profile?.fullName}</p>
               <div className="card-actions">
                 <button className="btn btn-primary">Follow</button>
-                {user?.id !== profile.id && renderButton()}
+                {user?.userId !== profile.userId && renderButton()}
                 {/*<button className="btn btn-primary">Message</button>*/}
               </div>
               <hr className={"text-white w-full mt-6"} />

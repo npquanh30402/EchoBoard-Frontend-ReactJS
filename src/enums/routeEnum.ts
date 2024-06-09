@@ -12,4 +12,6 @@ export enum RouteEnum {
   ADMIN = "/admin",
   CONVERSATION = "/conversation",
   PROFILE = "/profile/:id",
+  CREATE_POST = "create-post",
+  POST = "/posts",
 }

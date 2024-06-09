@@ -5,7 +5,28 @@ export async function acceptFriendRequestService(id: string) {
   try {
     const response = await axios.patch(
       import.meta.env.VITE_SERVER_URL +
-        `/api/friend/accept-friend-request/${id}`,
+        `/api/friends/accept-friend-request/${id}`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
+
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    // @ts-ignore
+    toast.error(error.response.data);
+    return null;
+  }
+}
+
+export async function rejectFriendRequestService(id: string) {
+  try {
+    const response = await axios.patch(
+      import.meta.env.VITE_SERVER_URL +
+        `/api/friends/reject-friend-request/${id}`,
       {},
       {
         withCredentials: true,
@@ -25,7 +46,7 @@ export async function acceptFriendRequestService(id: string) {
 export async function fetchFriendshipStatusService(id: string) {
   try {
     const response = await axios.get(
-      import.meta.env.VITE_SERVER_URL + `/api/friend/friendship-status/${id}`,
+      import.meta.env.VITE_SERVER_URL + `/api/friends/friendship-status/${id}`,
       {
         withCredentials: true,
       },
@@ -44,14 +65,15 @@ export async function fetchFriendshipStatusService(id: string) {
 export async function sendFriendRequestService(id: string) {
   try {
     const response = await axios.post(
-      import.meta.env.VITE_SERVER_URL + `/api/friend/send-friend-request/${id}`,
+      import.meta.env.VITE_SERVER_URL +
+        `/api/friends/send-friend-request/${id}`,
       {},
       {
         withCredentials: true,
       },
     );
 
-    if (response.status === 200) {
+    if (response.status === 201) {
       return response.data;
     }
   } catch (error) {
@@ -64,7 +86,8 @@ export async function sendFriendRequestService(id: string) {
 export async function deleteRequestSentService(id: string) {
   try {
     const response = await axios.delete(
-      import.meta.env.VITE_SERVER_URL + `/api/friend/delete-request-sent/${id}`,
+      import.meta.env.VITE_SERVER_URL +
+        `/api/friends/delete-request-sent/${id}`,
       {
         withCredentials: true,
       },
@@ -83,7 +106,7 @@ export async function deleteRequestSentService(id: string) {
 export async function fetchFriendRequestService(formData: object) {
   try {
     const response = await axios.post(
-      import.meta.env.VITE_SERVER_URL + `/api/friend/friend-request`,
+      import.meta.env.VITE_SERVER_URL + `/api/friends/friend-request`,
       formData,
       {
         withCredentials: true,
@@ -103,7 +126,7 @@ export async function fetchFriendRequestService(formData: object) {
 export async function fetchRequestSentService(formData: object) {
   try {
     const response = await axios.post(
-      import.meta.env.VITE_SERVER_URL + `/api/friend/request-sent`,
+      import.meta.env.VITE_SERVER_URL + `/api/friends/request-sent`,
       formData,
       {
         withCredentials: true,
@@ -123,7 +146,7 @@ export async function fetchRequestSentService(formData: object) {
 export async function fetchFriendService(formData: object) {
   try {
     const response = await axios.post(
-      import.meta.env.VITE_SERVER_URL + `/api/friend/friend-list`,
+      import.meta.env.VITE_SERVER_URL + `/api/friends/friend-list`,
       formData,
       {
         withCredentials: true,

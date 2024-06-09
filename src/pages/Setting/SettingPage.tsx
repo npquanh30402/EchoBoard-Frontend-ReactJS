@@ -1,9 +1,4 @@
-import {
-  useAppDispatch,
-  useAppSelector,
-  useDocumentTitle,
-  useNotificationWebSocket,
-} from "../../hooks";
+import { useAppDispatch, useAppSelector, useDocumentTitle } from "../../hooks";
 import React, { useState } from "react";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { PROFILE } from "../../store/authSlice.ts";
@@ -25,8 +20,6 @@ export const SettingPage = () => {
     fullName: profile?.fullName || "",
     bio: profile?.bio || "",
   });
-
-  const { sendNotification } = useNotificationWebSocket();
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -55,8 +48,8 @@ export const SettingPage = () => {
       return previewURL;
     }
 
-    if (profile?.profilePictureUrl) {
-      return import.meta.env.VITE_SERVER_URL + "/" + profile?.profilePictureUrl;
+    if (profile?.avatarUrl) {
+      return import.meta.env.VITE_SERVER_URL + "/" + profile?.avatarUrl;
     } else {
       return avatarBackup;
     }
@@ -81,7 +74,7 @@ export const SettingPage = () => {
     }
 
     if (selectedFile) {
-      formDataObject.append("profilePictureUrl", selectedFile);
+      formDataObject.append("avatarUrl", selectedFile);
       setSelectedFile(null);
     }
 
@@ -92,14 +85,6 @@ export const SettingPage = () => {
     if (data) {
       toast.success("Updated successfully!");
       dispatch(PROFILE(data));
-
-      sendNotification({
-        notification: {
-          type: "account_activity",
-          content: "You have updated your profile",
-          receiverId: user!.id,
-        },
-      });
     }
   };
 
@@ -123,7 +108,7 @@ export const SettingPage = () => {
               />
               <input
                 type="file"
-                name={"profilePictureUrl"}
+                name={"avatarUrl"}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 onChange={handleFileChange}
               />
