@@ -21,7 +21,6 @@ export const useMessageWebSocket = () => {
   const handleIncomingConversationMessage = useCallback(() => {
     if (lastJsonMessage !== null) {
       const msg = lastJsonMessage as MessageInterface;
-      console.log(msg);
       dispatch(
         ADD_MESSAGE({
           conversationId: msg.conversationId,

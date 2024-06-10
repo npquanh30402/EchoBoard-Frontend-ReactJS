@@ -4,6 +4,7 @@ import { friendReducer } from "./friendSlice.ts";
 import { conversationReducer } from "./conversationSlice.ts";
 import { notificationReducer } from "./notificationSlice.ts";
 import { themeReducer } from "./themeSlice.ts";
+import { postReducer } from "./postSlice.ts";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     conversation: conversationReducer,
     notification: notificationReducer,
     theme: themeReducer,
+    post: postReducer,
   },
 });
 

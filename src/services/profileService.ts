@@ -5,6 +5,9 @@ export async function fetchProfileService(id: string) {
   try {
     const response = await axios.get(
       import.meta.env.VITE_SERVER_URL + "/api/profiles/" + id,
+      {
+        withCredentials: true,
+      },
     );
 
     if (response.status === 200) {

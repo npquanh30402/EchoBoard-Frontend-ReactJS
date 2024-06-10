@@ -45,7 +45,7 @@ export const DropDownProfile = () => {
           {user ? (
             <>
               <li className={"border-b mb-2 py-2"}>
-                <a>{user.username}</a>
+                <Link to={"/profile/" + user.userId}>{user.username}</Link>
               </li>
               <li>
                 <Link to={RouteEnum.FRIEND}>Friends</Link>

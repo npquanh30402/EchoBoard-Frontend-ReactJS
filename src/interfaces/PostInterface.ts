@@ -4,6 +4,7 @@ export interface PostInterface {
   postContent: string;
   likeCount: number;
   commentCount: number;
+  likedByUser: string | null;
   author: {
     userId: string;
     username: string;

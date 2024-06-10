@@ -1,11 +1,11 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export async function fetchPostLatestService(formData: object) {
+export async function likeAPostService(id: string) {
   try {
     const response = await axios.post(
-      import.meta.env.VITE_SERVER_URL + "/api/posts/latest",
-      formData,
+      import.meta.env.VITE_SERVER_URL + "/api/like/" + id + "/like",
+      {},
       {
         withCredentials: true,
       },
@@ -21,11 +21,11 @@ export async function fetchPostLatestService(formData: object) {
   }
 }
 
-export async function createPostService(formData: object) {
+export async function dislikeAPostService(id: string) {
   try {
     const response = await axios.post(
-      import.meta.env.VITE_SERVER_URL + "/api/posts",
-      formData,
+      import.meta.env.VITE_SERVER_URL + "/api/like/" + id + "/dislike",
+      {},
       {
         withCredentials: true,
       },
@@ -41,10 +41,10 @@ export async function createPostService(formData: object) {
   }
 }
 
-export async function fetchPostService(id: string) {
+export async function deleteALikeService(id: string) {
   try {
-    const response = await axios.get(
-      import.meta.env.VITE_SERVER_URL + "/api/posts/" + id,
+    const response = await axios.delete(
+      import.meta.env.VITE_SERVER_URL + "/api/like/" + id,
       {
         withCredentials: true,
       },
@@ -56,7 +56,6 @@ export async function fetchPostService(id: string) {
   } catch (error) {
     // @ts-ignore
     toast.error(error.response.data);
-    throw error;
-    // return null;
+    return null;
   }
 }
