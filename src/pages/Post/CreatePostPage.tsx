@@ -5,6 +5,8 @@ import {
   BoldItalicUnderlineToggles,
   CodeToggle,
   CreateLink,
+  diffSourcePlugin,
+  DiffSourceToggleWrapper,
   headingsPlugin,
   imagePlugin,
   InsertImage,
@@ -82,6 +84,7 @@ export const CreatePostPage = () => {
                 ref={mdxRef}
                 markdown=""
                 plugins={[
+                  diffSourcePlugin(),
                   headingsPlugin(),
                   quotePlugin(),
                   listsPlugin(),
@@ -108,6 +111,7 @@ export const CreatePostPage = () => {
                         <p className={"text-slate-400 text-lg"}>|</p>
                         <InsertTable />
                         <InsertThematicBreak />
+                        <DiffSourceToggleWrapper children={undefined} />
                       </>
                     ),
                   }),

@@ -74,7 +74,13 @@ export const Homepage = () => {
           }
         >
           {postList.length > 0 &&
-            postList.map((item) => <PostItem key={item.postId} post={item} />)}
+            postList.map((item) => (
+              <PostItem
+                key={item.postId}
+                post={item}
+                setPostList={setPostList}
+              />
+            ))}
         </div>
       </div>
     </section>

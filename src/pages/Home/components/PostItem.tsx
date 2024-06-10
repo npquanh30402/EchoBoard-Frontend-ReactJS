@@ -8,20 +8,26 @@ import {
   dislikeAPostService,
   likeAPostService,
 } from "../../../services";
-import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { MODIFY_POST } from "../../../store/postSlice.ts";
+import { useAppSelector } from "../../../hooks";
+import { Dispatch, SetStateAction } from "react";
 
-export const PostItem = ({ post }: { post: PostInterface }) => {
+export const PostItem = ({
+  post,
+  setPostList,
+}: {
+  post: PostInterface;
+  setPostList: Dispatch<SetStateAction<PostInterface[]>>;
+}) => {
   const { user } = useAppSelector((state) => state.auth);
   const { author } = post;
 
-  const avatar = import.meta.env.VITE_SERVER_URL + author.avatarUrl;
+  const avatar = import.meta.env.VITE_SERVER_URL + "/" + author.avatarUrl;
 
   const dateCreated = formatDistanceToNow(new Date(String(post.createdAt)), {
     addSuffix: true,
   });
 
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   function checkUser() {
@@ -40,13 +46,27 @@ export const PostItem = ({ post }: { post: PostInterface }) => {
     const response = await dislikeAPostService(post.postId);
 
     if (response) {
-      dispatch(
-        MODIFY_POST({
-          ...post,
-          likeCount: post.likeCount - (post.likedByUser === "like" ? 2 : 1),
-          likedByUser: "dislike",
-        }),
-      );
+      // dispatch(
+      //   MODIFY_POST({
+      //     ...post,
+      //     likeCount: post.likeCount - (post.likedByUser === "like" ? 2 : 1),
+      //     likedByUser: "dislike",
+      //   }),
+      // );
+
+      setPostList((prevPostList) => {
+        return prevPostList.map((prevPost) => {
+          if (prevPost.postId === post.postId) {
+            return {
+              ...prevPost,
+              likeCount:
+                prevPost.likeCount - (prevPost.likedByUser === "like" ? 2 : 1),
+              likedByUser: "dislike",
+            };
+          }
+          return prevPost;
+        });
+      });
     }
   }
 
@@ -59,13 +79,28 @@ export const PostItem = ({ post }: { post: PostInterface }) => {
     const response = await likeAPostService(post.postId);
 
     if (response) {
-      dispatch(
-        MODIFY_POST({
-          ...post,
-          likeCount: post.likeCount + (post.likedByUser === "dislike" ? 2 : 1),
-          likedByUser: "like",
-        }),
-      );
+      // dispatch(
+      //   MODIFY_POST({
+      //     ...post,
+      //     likeCount: post.likeCount + (post.likedByUser === "dislike" ? 2 : 1),
+      //     likedByUser: "like",
+      //   }),
+      // );
+
+      setPostList((prevPostList) => {
+        return prevPostList.map((prevPost) => {
+          if (prevPost.postId === post.postId) {
+            return {
+              ...prevPost,
+              likeCount:
+                prevPost.likeCount +
+                (prevPost.likedByUser === "dislike" ? 2 : 1),
+              likedByUser: "like",
+            };
+          }
+          return prevPost;
+        });
+      });
     }
   }
 
@@ -75,13 +110,27 @@ export const PostItem = ({ post }: { post: PostInterface }) => {
     const response = await deleteALikeService(post.postId);
 
     if (response) {
-      dispatch(
-        MODIFY_POST({
-          ...post,
-          likeCount: post.likeCount + (post.likedByUser === "like" ? -1 : 1),
-          likedByUser: null,
-        }),
-      );
+      // dispatch(
+      //   MODIFY_POST({
+      //     ...post,
+      //     likeCount: post.likeCount + (post.likedByUser === "like" ? -1 : 1),
+      //     likedByUser: null,
+      //   }),
+      // );
+
+      setPostList((prevPostList) => {
+        return prevPostList.map((prevPost) => {
+          if (prevPost.postId === post.postId) {
+            return {
+              ...prevPost,
+              likeCount:
+                prevPost.likeCount + (prevPost.likedByUser === "like" ? -1 : 1),
+              likedByUser: null,
+            };
+          }
+          return prevPost;
+        });
+      });
     }
   }
 
@@ -117,8 +166,8 @@ export const PostItem = ({ post }: { post: PostInterface }) => {
               <span className={"text-sm"}>{dateCreated}</span>
             </div>
             <Link to={RouteEnum.POST + "/" + post.postId}>
-              <h2 className="card-title text-lg text-black dark:text-white">
-                {post.postContent}
+              <h2 className="card-title text-lg text-black dark:text-white uppercase">
+                {post.postTitle}
               </h2>
               <p>{post.postContent}</p>
             </Link>
