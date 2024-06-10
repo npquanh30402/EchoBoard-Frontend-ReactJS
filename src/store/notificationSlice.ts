@@ -3,16 +3,16 @@ import { CursorSearchInterface, NotificationInterface } from "../interfaces";
 
 type NotificationStateType = {
   notifications: NotificationInterface[];
-  unread_count: number;
+  unreadCount: number;
   fetchCursor: CursorSearchInterface | undefined;
-  isFinished: boolean;
+  hasMore: boolean;
 };
 
 const notificationInitialState: NotificationStateType = {
   notifications: [],
-  unread_count: 0,
+  unreadCount: 0,
   fetchCursor: undefined,
-  isFinished: false,
+  hasMore: true,
 };
 
 export const notificationSlice = createSlice({
@@ -20,7 +20,7 @@ export const notificationSlice = createSlice({
   initialState: notificationInitialState,
   reducers: {
     SET_UNREAD_COUNT: (state, action) => {
-      state.unread_count = action.payload;
+      state.unreadCount = action.payload;
     },
     SET_NOTIFICATIONS: (state, action) => {
       if (action.payload.length > 0) {
@@ -31,12 +31,12 @@ export const notificationSlice = createSlice({
           createdAt: lastItem.createdAt,
         };
       } else {
-        state.isFinished = true;
+        state.hasMore = false;
       }
     },
     ADD_NOTIFICATION: (state, action) => {
       state.notifications.unshift(action.payload);
-      state.unread_count++;
+      state.unreadCount++;
       const lastItem = state.notifications[state.notifications.length - 1];
       state.fetchCursor = {
         id: lastItem.notificationId!,
@@ -51,14 +51,14 @@ export const notificationSlice = createSlice({
         notification.isRead = true;
       }
 
-      state.unread_count--;
+      state.unreadCount--;
     },
     MARK_ALL_NOTIFICATION_AS_READ: (state) => {
       state.notifications.forEach((notification) => {
         notification.isRead = true;
       });
 
-      state.unread_count = 0;
+      state.unreadCount = 0;
     },
   },
 });

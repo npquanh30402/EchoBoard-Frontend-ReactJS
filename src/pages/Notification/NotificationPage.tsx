@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector, useDocumentTitle } from "../../hooks";
 import { NotificationItem } from "./components/NotificationItem.tsx";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   MARK_ALL_NOTIFICATION_AS_READ,
   SET_NOTIFICATIONS,
@@ -14,13 +14,19 @@ import { toast } from "react-toastify";
 export const NotificationPage = () => {
   useDocumentTitle("Notifications");
 
-  const { notifications, unread_count, fetchCursor, isFinished } =
-    useAppSelector((state) => state.notification);
-
   const dispatch = useAppDispatch();
 
+  const { notifications, unreadCount, fetchCursor, hasMore } = useAppSelector(
+    (state) => state.notification,
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const loadingRef = useRef(null);
+
   const fetchNotificationList = useCallback(async () => {
-    if (isFinished) return;
+    if (!hasMore) return;
+    if (isLoading) return;
+
+    setIsLoading(true);
 
     const formData = {
       cursor: fetchCursor,
@@ -30,27 +36,36 @@ export const NotificationPage = () => {
 
     if (response) {
       dispatch(SET_NOTIFICATIONS(response));
+      setIsLoading(false);
     }
-  }, [dispatch, fetchCursor]);
+  }, [dispatch, fetchCursor, hasMore, isLoading]);
 
   useEffect(() => {
     fetchNotificationList().then();
   }, []);
 
   useEffect(() => {
-    function handleScroll() {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-          document.documentElement.offsetHeight - 5 &&
-        !isFinished
-      ) {
-        fetchNotificationList().then();
-      }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNotificationList().then();
+        }
+      },
+      { threshold: 1.0 },
+    );
+
+    const currentRef = loadingRef.current;
+
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [fetchNotificationList, isFinished]);
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [fetchNotificationList]);
 
   async function handleMarkAllAsRead() {
     const response = await markAllNotificationAsReadService();
@@ -70,7 +85,7 @@ export const NotificationPage = () => {
               Notifications
             </h1>
           </div>
-          {unread_count > 1 && (
+          {unreadCount > 1 && (
             <button className="btn btn-outline" onClick={handleMarkAllAsRead}>
               Mark all as read
             </button>
@@ -84,6 +99,16 @@ export const NotificationPage = () => {
               key={notification.notificationId}
             />
           ))}
+
+        <div id="loading" ref={loadingRef} className={"mt-12 text-lg"}>
+          {isLoading ? (
+            <p>Loading more content...</p>
+          ) : !hasMore ? (
+            <p>No more content to load</p>
+          ) : (
+            <p>Scroll down to load more content</p>
+          )}
+        </div>
       </div>
     </section>
   );

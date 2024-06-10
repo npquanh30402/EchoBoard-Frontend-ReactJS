@@ -6,7 +6,7 @@ import { SET_UNREAD_COUNT } from "../../store/notificationSlice.ts";
 import { fetchNotificationUnreadCountService } from "../../services";
 
 export const NotificationHeader = () => {
-  const { unread_count } = useAppSelector((state) => state.notification);
+  const { unreadCount } = useAppSelector((state) => state.notification);
 
   const dispatch = useAppDispatch();
 
@@ -27,9 +27,9 @@ export const NotificationHeader = () => {
       <Link to={RouteEnum.NOTIFICATION} className="btn btn-ghost btn-circle">
         <div className={"indicator"}>
           <i className="bi bi-bell text-xl"></i>
-          {unread_count > 0 && (
+          {unreadCount > 0 && (
             <span className="badge badge-sm indicator-item bg-red-500 text-white">
-              {unread_count}
+              {unreadCount}
             </span>
           )}
         </div>

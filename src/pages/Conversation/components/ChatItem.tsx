@@ -16,8 +16,6 @@ import { fetchMessagesService, storeMessagesService } from "../../../services";
 export const ChatItem = () => {
   const { user } = useAppSelector((state) => state.auth);
 
-  // const { conversationId } = useParams();
-
   const { activeConversation, messages, fetchCursors, isFinished } =
     useAppSelector((state) => state.conversation);
 

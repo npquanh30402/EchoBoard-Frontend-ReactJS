@@ -1,5 +1,5 @@
 import { useDocumentTitle } from "../../hooks";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PostItem } from "./components/PostItem.tsx";
 import { fetchPostLatestService } from "../../services";
 import { CursorSearchInterface, PostInterface } from "../../interfaces";
@@ -8,16 +8,21 @@ export const Homepage = () => {
   useDocumentTitle("Homepage");
 
   const [postList, setPostList] = useState<PostInterface[]>([]);
+
   const [hasMore, setHasMore] = useState(true);
   const [fetchCursor, setFetchCursor] = useState<
     CursorSearchInterface | undefined
   >(undefined);
 
-  // const { posts, cursor, hasMore } = useAppSelector((state) => state.post);
-  //
-  // const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const loadingRef = useRef(null);
 
   const fetchData = useCallback(async () => {
+    if (!hasMore) return;
+    if (isLoading) return;
+
+    setIsLoading(true);
+
     const formData = {
       cursor: fetchCursor,
     };
@@ -34,33 +39,38 @@ export const Homepage = () => {
         });
         return updatedPostList;
       });
-
-      setHasMore(true);
     } else {
       setHasMore(false);
-
-      // dispatch(SET_POSTS(response));
     }
-  }, [fetchCursor]);
+    setIsLoading(false);
+  }, [fetchCursor, hasMore, isLoading]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchData().then();
+        }
+      },
+      { threshold: 1.0 },
+    );
+
+    const currentRef = loadingRef.current;
+
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [fetchData]);
 
   useEffect(() => {
     fetchData().then();
   }, []);
-
-  useEffect(() => {
-    function handleScroll() {
-      const scroll =
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 1;
-
-      if (scroll && hasMore) {
-        fetchData().then();
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [fetchData, hasMore]);
 
   return (
     <section id={"homepage"}>
@@ -81,6 +91,15 @@ export const Homepage = () => {
                 setPostList={setPostList}
               />
             ))}
+        </div>
+        <div id="loading" ref={loadingRef} className={"mt-12 text-lg"}>
+          {isLoading ? (
+            <p>Loading more content...</p>
+          ) : !hasMore ? (
+            <p>No more content to load</p>
+          ) : (
+            <p>Scroll down to load more content</p>
+          )}
         </div>
       </div>
     </section>

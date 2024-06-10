@@ -1,5 +1,12 @@
 import { FollowCardItem } from "./FollowCardItem.tsx";
-import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FetchFollowerService } from "../../../services";
 import { FollowDataType } from "./Tabs.tsx";
 
@@ -12,7 +19,15 @@ export const FollowerTab = ({
   userId: string;
   setFollowerData: Dispatch<SetStateAction<FollowDataType>>;
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const loadingRef = useRef(null);
+
   const fetchData = useCallback(async () => {
+    if (!followerData.hasMore) return;
+    if (isLoading) return;
+
+    setIsLoading(true);
+
     const formData = {
       cursor: followerData.fetchCursor,
     };
@@ -42,28 +57,44 @@ export const FollowerTab = ({
         };
       });
     }
-  }, [followerData.fetchCursor, setFollowerData, userId]);
+
+    setIsLoading(false);
+  }, [
+    followerData.fetchCursor,
+    followerData.hasMore,
+    isLoading,
+    setFollowerData,
+    userId,
+  ]);
 
   useEffect(() => {
-    function handleScroll() {
-      const scroll =
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 5;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchData().then();
+        }
+      },
+      { threshold: 1.0 },
+    );
 
-      if (scroll && followerData.hasMore) {
-        fetchData().then();
-      }
+    const currentRef = loadingRef.current;
+
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [fetchData, followerData.hasMore]);
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [fetchData]);
 
   useEffect(() => {
     if (followerData.list.length === 0) {
       fetchData().then();
     }
-  }, []);
+  }, [followerData.list.length]);
 
   return (
     <>
@@ -74,6 +105,15 @@ export const FollowerTab = ({
             followerData.list.map((item) => {
               return <FollowCardItem key={item.followId} user={item} />;
             })}
+        </div>
+        <div id="loading" ref={loadingRef} className={"mt-12 text-lg"}>
+          {isLoading ? (
+            <p>Loading more content...</p>
+          ) : !followerData.hasMore ? (
+            <p>No more content to load</p>
+          ) : (
+            <p>Scroll down to load more content</p>
+          )}
         </div>
       </div>
     </>
