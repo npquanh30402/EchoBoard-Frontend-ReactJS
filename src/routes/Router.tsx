@@ -7,6 +7,7 @@ import {
   CreatePostPage,
   FriendPage,
   FriendRequest,
+  GlobalChatPage,
   Homepage,
   Login,
   NotificationPage,
@@ -126,6 +127,14 @@ export const Router = createBrowserRouter([
         element: (
           <AuthProtectedRoute>
             <SettingPage />
+          </AuthProtectedRoute>
+        ),
+      },
+      {
+        path: RouteEnum.GLOBAL_CHAT,
+        element: (
+          <AuthProtectedRoute>
+            <GlobalChatPage />
           </AuthProtectedRoute>
         ),
       },

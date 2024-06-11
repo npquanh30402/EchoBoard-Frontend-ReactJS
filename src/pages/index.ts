@@ -18,3 +18,4 @@ export {
 } from "./Friend/index.tsx";
 
 export { CreatePostPage } from "./Post/CreatePostPage.tsx";
+export { GlobalChatPage } from "./GlobalChat/GlobalChatPage.tsx";

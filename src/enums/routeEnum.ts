@@ -14,4 +14,5 @@ export enum RouteEnum {
   PROFILE = "/profile/:id",
   CREATE_POST = "create-post",
   POST = "/posts",
+  GLOBAL_CHAT = "/global-chat",
 }

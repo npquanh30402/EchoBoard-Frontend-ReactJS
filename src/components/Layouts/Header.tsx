@@ -83,6 +83,9 @@ export const Header = () => {
                 </ul>
               </details>
             </li>
+            <li>
+              <NavLink to={RouteEnum.GLOBAL_CHAT}>Global Chat</NavLink>
+            </li>
           </ul>
         </div>
         <div className="navbar-end flex md:gap-2">
