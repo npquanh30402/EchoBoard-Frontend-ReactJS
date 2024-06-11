@@ -36,8 +36,17 @@ export const ChatRight = ({ message }: { message: MessageType }) => {
         <div className="chat-header gap-2 flex items-center">
           <span className={"font-bold text-xl"}>{message.username}</span>
         </div>
-        <div>
-          <div className="chat-bubble">{message.message}</div>
+        <div className={"flex flex-col gap-2 items-end"}>
+          {message.file && (
+            <img
+              src={import.meta.env.VITE_SERVER_URL + "/" + message.file}
+              alt={""}
+              className={"rounded w-full md:w-1/2"}
+            />
+          )}
+          {message.message.length > 0 && (
+            <div className="chat-bubble">{message.message}</div>
+          )}
           <time className="text-xs opacity-50">{msgDate}</time>
         </div>
       </div>

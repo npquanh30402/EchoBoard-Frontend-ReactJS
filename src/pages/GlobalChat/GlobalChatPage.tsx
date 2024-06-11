@@ -5,12 +5,14 @@ import { useAppSelector } from "../../hooks";
 import { ChatLeft } from "./components/ChatLeft.tsx";
 import { ChatRight } from "./components/ChatRight.tsx";
 import { UserItem } from "./components/UserItem.tsx";
+import { UploadImageService } from "../../services";
 
 export type MessageType = {
   userId: string;
   username: string;
   avatarUrl: string;
   message: string;
+  file: string;
   createdAt: Date;
 };
 
@@ -32,9 +34,10 @@ export const GlobalChatPage = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [formData, setFormData] = useState({
     message: "",
+    imageFile: null,
   });
 
-  const { lastJsonMessage, sendMessage } = useWebSocket(
+  const { lastJsonMessage, sendJsonMessage } = useWebSocket(
     import.meta.env.VITE_WEBSOCKET_URL + "/ws/global-chat",
     {
       shouldReconnect: () => true,
@@ -71,20 +74,45 @@ export const GlobalChatPage = () => {
   }, [lastJsonMessage]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, type, files, value } = event.target;
+
+    if (type === "file") {
+      setFormData({
+        ...formData,
+        [name]: files?.[0],
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleClickSendMessage = async (evt: FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
 
-    if (formData.message.length > 0) {
-      sendMessage(sanitizeAndTrimString(formData.message));
+    if (formData.message.trim().length > 0 || formData.imageFile !== null) {
+      let filePath = null;
+
+      if (formData.imageFile) {
+        const formDataObject = new FormData();
+        formDataObject.append("imageFile", formData.imageFile);
+        const response = await UploadImageService(formDataObject);
+
+        if (response) {
+          filePath = response;
+        }
+      }
+
+      sendJsonMessage({
+        message: sanitizeAndTrimString(formData.message),
+        file: filePath,
+      });
+
       setFormData({
         message: "",
+        imageFile: null,
       });
     }
   };
@@ -128,8 +156,19 @@ export const GlobalChatPage = () => {
                   value={formData.message}
                   onChange={handleChange}
                 ></input>
+                <div className="relative">
+                  <button type={"button"} className={"btn btn-primary"}>
+                    <i className="bi bi-image text-xl"></i>
+                  </button>
+                  <input
+                    type="file"
+                    name={"imageFile"}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={handleChange}
+                  />
+                </div>
                 <button type={"submit"} className={"btn btn-primary"}>
-                  Send
+                  <i className="bi bi-send text-xl"></i>
                 </button>
               </div>
             </form>
