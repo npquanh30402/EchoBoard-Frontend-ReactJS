@@ -23,7 +23,7 @@ import {
   toolbarPlugin,
   UndoRedo,
 } from "@mdxeditor/editor";
-import { createPostService } from "../../services";
+import { createPostService, UploadImageService } from "../../services";
 import { toast } from "react-toastify";
 import { sanitizeAndTrimString } from "../../utils";
 import { useNavigate } from "react-router-dom";
@@ -57,6 +57,15 @@ export const CreatePostPage = () => {
     }
   }
 
+  async function imageUploadHandler(image: File) {
+    const formData = new FormData();
+    formData.append("imageFile", image);
+
+    const response = await UploadImageService(formData);
+
+    return import.meta.env.VITE_SERVER_URL + "/" + response;
+  }
+
   return (
     <>
       <div className={"container mx-auto flex flex-col items-center my-8"}>
@@ -88,7 +97,9 @@ export const CreatePostPage = () => {
                   headingsPlugin(),
                   quotePlugin(),
                   listsPlugin(),
-                  imagePlugin(),
+                  imagePlugin({
+                    imageUploadHandler,
+                  }),
                   markdownShortcutPlugin(),
                   tablePlugin(),
                   thematicBreakPlugin(),

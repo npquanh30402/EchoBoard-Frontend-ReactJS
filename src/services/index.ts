@@ -9,3 +9,4 @@ export * from "./postService.ts";
 export * from "./likeService.ts";
 export * from "./followService.ts";
 export * from "./utilService.ts";
+export * from "./commentService.ts";

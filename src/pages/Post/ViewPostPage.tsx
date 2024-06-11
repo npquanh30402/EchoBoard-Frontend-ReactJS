@@ -15,6 +15,7 @@ import { useAppSelector, useDocumentTitle } from "../../hooks";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { RouteEnum } from "../../enums";
 import { formatDistanceToNow } from "date-fns";
+import { CommentSection } from "./components/CommentSection.tsx";
 
 export const ViewPostPage = () => {
   const [post, setPost] = useState<PostInterface | null>(null);
@@ -43,7 +44,7 @@ export const ViewPostPage = () => {
       .catch(() => {
         navigate(RouteEnum.HOME);
       });
-  }, [postId]);
+  }, [navigate, postId]);
 
   const dateCreated = () => {
     return formatDistanceToNow(new Date(post?.createdAt as unknown as string), {
@@ -105,9 +106,7 @@ export const ViewPostPage = () => {
               "border-2 border-black dark:border-white w-full mt-10 mb-4"
             }
           ></p>
-          <div className={"w-full"}>
-            <h2 className={"underline underline-offset-8"}>Comments</h2>
-          </div>
+          <CommentSection post={post} setPost={setPost} postId={post.postId} />
         </div>
       )}
     </section>
