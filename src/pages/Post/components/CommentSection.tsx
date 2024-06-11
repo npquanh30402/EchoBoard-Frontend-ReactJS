@@ -16,11 +16,9 @@ import { useAppSelector } from "../../../hooks";
 export const CommentSection = ({
   post,
   setPost,
-  postId,
 }: {
   post: PostInterface;
   setPost: (post: PostInterface) => void;
-  postId: string;
 }) => {
   const { user, profile } = useAppSelector((state) => state.auth);
   const [commentList, setCommentList] = useState<CommentInterface[]>([]);
@@ -44,7 +42,7 @@ export const CommentSection = ({
       cursor: fetchCursor,
     };
 
-    const response = await fetchCommentListService(postId, formData);
+    const response = await fetchCommentListService(post.postId, formData);
 
     if (response.length > 0) {
       setCommentList((prevCommentList) => {
@@ -60,7 +58,7 @@ export const CommentSection = ({
       setHasMore(false);
     }
     setIsLoading(false);
-  }, [fetchCursor, hasMore, isLoading, postId]);
+  }, [fetchCursor, hasMore, isLoading, post.postId]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -98,7 +96,7 @@ export const CommentSection = ({
       formData.append("commentContent", sanitizeAndTrimString(comment));
 
       const response = (await createACommentService(
-        postId,
+        post.postId,
         formData,
       )) as CommentInterface;
 
@@ -107,7 +105,7 @@ export const CommentSection = ({
 
         commentList.unshift({
           ...response,
-          postId: postId,
+          postId: post.postId,
           author: {
             userId: user!.userId,
             username: user!.username,
@@ -145,7 +143,14 @@ export const CommentSection = ({
         </form>
         {commentList.length > 0 &&
           commentList.map((comment) => {
-            return <CommentItem key={comment.commentId} comment={comment} />;
+            return (
+              <CommentItem
+                post={post}
+                setPost={setPost}
+                key={comment.commentId}
+                comment={comment}
+              />
+            );
           })}
         <div
           id="loading"

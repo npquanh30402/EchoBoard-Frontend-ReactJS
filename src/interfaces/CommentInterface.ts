@@ -4,6 +4,7 @@ export interface CommentInterface {
   parentCommentId: string | null;
   commentContent: string;
   commentCount?: number;
+  replyCount?: number | null;
   author: {
     userId: string;
     username: string;
