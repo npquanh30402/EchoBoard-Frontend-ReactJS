@@ -1,138 +1,23 @@
 import { PostInterface } from "../../../interfaces";
 import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { formatDistanceToNow } from "date-fns";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { RouteEnum } from "../../../enums";
-import {
-  deleteALikeService,
-  dislikeAPostService,
-  likeAPostService,
-} from "../../../services";
-import { useAppSelector } from "../../../hooks";
-import { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
+import { LikeButton } from "../../../components/Elements/LikeButton.tsx";
 
-export const PostItem = ({
-  post,
-  setPostList,
-}: {
-  post: PostInterface;
-  setPostList: Dispatch<SetStateAction<PostInterface[]>>;
-}) => {
-  const { user } = useAppSelector((state) => state.auth);
+export const PostItem = ({ post }: { post: PostInterface }) => {
   const { author } = post;
+  const [postState, setPostState] = useState<PostInterface>(post);
 
   const avatar = import.meta.env.VITE_SERVER_URL + "/" + author.avatarUrl;
 
-  const dateCreated = formatDistanceToNow(new Date(String(post.createdAt)), {
-    addSuffix: true,
-  });
-
-  // const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
-  function checkUser() {
-    if (!user) {
-      navigate(RouteEnum.LOGIN);
-    }
-  }
-
-  async function handleDislike() {
-    checkUser();
-    if (post.likedByUser === "dislike") {
-      await handleDeleteLike();
-      return;
-    }
-
-    const response = await dislikeAPostService(post.postId);
-
-    if (response) {
-      // dispatch(
-      //   MODIFY_POST({
-      //     ...post,
-      //     likeCount: post.likeCount - (post.likedByUser === "like" ? 2 : 1),
-      //     likedByUser: "dislike",
-      //   }),
-      // );
-
-      setPostList((prevPostList) => {
-        return prevPostList.map((prevPost) => {
-          if (prevPost.postId === post.postId) {
-            return {
-              ...prevPost,
-              likeCount:
-                prevPost.likeCount - (prevPost.likedByUser === "like" ? 2 : 1),
-              likedByUser: "dislike",
-            };
-          }
-          return prevPost;
-        });
-      });
-    }
-  }
-
-  async function handleLike() {
-    checkUser();
-    if (post.likedByUser === "like") {
-      await handleDeleteLike();
-      return;
-    }
-    const response = await likeAPostService(post.postId);
-
-    if (response) {
-      // dispatch(
-      //   MODIFY_POST({
-      //     ...post,
-      //     likeCount: post.likeCount + (post.likedByUser === "dislike" ? 2 : 1),
-      //     likedByUser: "like",
-      //   }),
-      // );
-
-      setPostList((prevPostList) => {
-        return prevPostList.map((prevPost) => {
-          if (prevPost.postId === post.postId) {
-            return {
-              ...prevPost,
-              likeCount:
-                prevPost.likeCount +
-                (prevPost.likedByUser === "dislike" ? 2 : 1),
-              likedByUser: "like",
-            };
-          }
-          return prevPost;
-        });
-      });
-    }
-  }
-
-  async function handleDeleteLike() {
-    checkUser();
-    if (post.likedByUser === null) return;
-    const response = await deleteALikeService(post.postId);
-
-    if (response) {
-      // dispatch(
-      //   MODIFY_POST({
-      //     ...post,
-      //     likeCount: post.likeCount + (post.likedByUser === "like" ? -1 : 1),
-      //     likedByUser: null,
-      //   }),
-      // );
-
-      setPostList((prevPostList) => {
-        return prevPostList.map((prevPost) => {
-          if (prevPost.postId === post.postId) {
-            return {
-              ...prevPost,
-              likeCount:
-                prevPost.likeCount + (prevPost.likedByUser === "like" ? -1 : 1),
-              likedByUser: null,
-            };
-          }
-          return prevPost;
-        });
-      });
-    }
-  }
+  const dateCreated = formatDistanceToNow(
+    new Date(String(postState.createdAt)),
+    {
+      addSuffix: true,
+    },
+  );
 
   return (
     <>
@@ -165,33 +50,20 @@ export const PostItem = ({
               </span>
               <span className={"text-sm"}>{dateCreated}</span>
             </div>
-            <Link to={RouteEnum.POST + "/" + post.postId}>
+            <Link to={RouteEnum.POST + "/" + postState.postId}>
               <h2 className="card-title text-lg text-black dark:text-white uppercase">
-                {post.postTitle}
+                {postState.postTitle}
               </h2>
-              <p>{post.postContent}</p>
+              <p>{postState.postContent}</p>
             </Link>
           </div>
           <div className="card-actions justify-start">
             <div className={"flex gap-2 items-center"}>
-              <button className={"btn btn-ghost"} onClick={handleLike}>
-                {post.likedByUser === "like" ? (
-                  <i className="bi bi-hand-thumbs-up-fill text-xl"></i>
-                ) : (
-                  <i className="bi bi-hand-thumbs-up text-xl"></i>
-                )}
-              </button>
-              <span>{post.likeCount}</span>
-              <button className={"btn btn-ghost"} onClick={handleDislike}>
-                {post.likedByUser === "dislike" ? (
-                  <i className="bi bi-hand-thumbs-down-fill text-xl"></i>
-                ) : (
-                  <i className="bi bi-hand-thumbs-down text-xl"></i>
-                )}
-              </button>
+              {/*@ts-ignore*/}
+              <LikeButton post={postState} setPost={setPostState} />
               <button className={"btn btn-ghost"}>
                 <i className="bi bi-chat-square text-xl mr-2"></i>
-                <span>{post.commentCount}</span>
+                <span>{postState.commentCount}</span>
               </button>
             </div>
           </div>

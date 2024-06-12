@@ -84,13 +84,7 @@ export const Homepage = () => {
           }
         >
           {postList.length > 0 &&
-            postList.map((item) => (
-              <PostItem
-                key={item.postId}
-                post={item}
-                setPostList={setPostList}
-              />
-            ))}
+            postList.map((item) => <PostItem key={item.postId} post={item} />)}
         </div>
         <div id="loading" ref={loadingRef} className={"mt-12 text-lg"}>
           {isLoading ? (

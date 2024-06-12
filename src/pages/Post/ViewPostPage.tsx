@@ -16,6 +16,7 @@ import avatarBackup from "/src/assets/images/avatar_backup.jpg";
 import { RouteEnum } from "../../enums";
 import { formatDistanceToNow } from "date-fns";
 import { CommentSection } from "./components/CommentSection.tsx";
+import { LikeButton } from "../../components/Elements/LikeButton.tsx";
 
 export const ViewPostPage = () => {
   const [post, setPost] = useState<PostInterface | null>(null);
@@ -106,7 +107,10 @@ export const ViewPostPage = () => {
               "border-2 border-black dark:border-white w-full mt-10 mb-4"
             }
           ></p>
-          <CommentSection post={post} setPost={setPost} postId={post.postId} />
+          <div className={"flex w-full justify-start gap-2 items-center"}>
+            <LikeButton post={post} setPost={setPost} />
+          </div>
+          <CommentSection post={post} setPost={setPost} />
         </div>
       )}
     </section>
