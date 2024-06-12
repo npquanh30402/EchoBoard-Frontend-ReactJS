@@ -16,18 +16,17 @@ export const DropdownNavbar = () => {
             <NavLink to={RouteEnum.HOME}>Homepage</NavLink>
           </li>
           <li>
-            <a>Parent</a>
+            <a>Post</a>
             <ul className="p-2">
               <li>
-                <a>Submenu 1</a>
-              </li>
-              <li>
-                <a>Submenu 2</a>
+                <NavLink to={RouteEnum.POST + "/" + RouteEnum.CREATE_POST}>
+                  Create a Post
+                </NavLink>
               </li>
             </ul>
           </li>
           <li>
-            <a>Item 3</a>
+            <NavLink to={RouteEnum.GLOBAL_CHAT}>Global Chat</NavLink>
           </li>
         </ul>
       </div>
