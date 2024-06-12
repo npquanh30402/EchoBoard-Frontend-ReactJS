@@ -5,6 +5,7 @@ import {
   AdminPage,
   ConversationPage,
   CreatePostPage,
+  EmailVerificationStatusPage,
   FriendPage,
   FriendRequest,
   GlobalChatPage,
@@ -23,6 +24,7 @@ import { AuthProtectedRoute } from "./AuthProtectedRoute.tsx";
 import { ChatItem } from "../pages/Conversation/components/ChatItem.tsx";
 import { PostPage } from "../pages/Post/PostPage.tsx";
 import { ViewPostPage } from "../pages/Post/ViewPostPage.tsx";
+import { GuestProtectedRoute } from "./GuestProtectedRoute.tsx";
 
 export const Router = createBrowserRouter([
   {
@@ -34,15 +36,27 @@ export const Router = createBrowserRouter([
       },
       {
         path: RouteEnum.REGISTER,
-        element: <Register />,
+        element: (
+          <GuestProtectedRoute>
+            <Register />
+          </GuestProtectedRoute>
+        ),
       },
       {
         path: RouteEnum.LOGIN,
-        element: <Login />,
+        element: (
+          <GuestProtectedRoute>
+            <Login />
+          </GuestProtectedRoute>
+        ),
       },
       {
         path: RouteEnum.FORGOT_PASSWORD,
-        element: <Homepage />,
+        element: (
+          <GuestProtectedRoute>
+            <Homepage />
+          </GuestProtectedRoute>
+        ),
       },
       {
         path: RouteEnum.POST,
@@ -136,6 +150,14 @@ export const Router = createBrowserRouter([
           <AuthProtectedRoute>
             <GlobalChatPage />
           </AuthProtectedRoute>
+        ),
+      },
+      {
+        path: "/verification-status",
+        element: (
+          // <GuestProtectedRoute>
+          <EmailVerificationStatusPage />
+          // </GuestProtectedRoute>
         ),
       },
       {

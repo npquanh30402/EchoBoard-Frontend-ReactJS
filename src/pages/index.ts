@@ -19,3 +19,5 @@ export {
 
 export { CreatePostPage } from "./Post/CreatePostPage.tsx";
 export { GlobalChatPage } from "./GlobalChat/GlobalChatPage.tsx";
+export { EmailVerificationPage } from "./Email/EmailVerificationPage.tsx";
+export { EmailVerificationStatusPage } from "./Email/EmailVerificationStatusPage.tsx";

@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppSelector } from "../hooks";
-import { Login } from "../pages";
+import { EmailVerificationPage, Login } from "../pages";
 
 export const AuthProtectedRoute = ({
   children,
@@ -10,7 +10,11 @@ export const AuthProtectedRoute = ({
   const { user } = useAppSelector((state) => state.auth);
 
   if (user) {
-    return children;
+    if (user.emailVerified) {
+      return children;
+    } else {
+      return <EmailVerificationPage />;
+    }
   }
 
   return <Login />;

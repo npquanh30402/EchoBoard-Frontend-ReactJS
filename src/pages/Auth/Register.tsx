@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDocumentTitle } from "../../hooks";
 import { useNavigate } from "react-router-dom";
-import { registerService } from "../../services";
+import { registerService, sendEmailVerificationService } from "../../services";
 import { sanitizeAndTrimString } from "../../utils";
 
 export const Register = () => {
@@ -85,6 +85,18 @@ export const Register = () => {
 
     const data = await registerService(formDataObject);
 
+    if (data) {
+      await sendEmailVerification(formData.email);
+
+      navigate("/login");
+    }
+  }
+
+  async function sendEmailVerification(email: string) {
+    const formData = new FormData();
+    formData.append("email", sanitizeAndTrimString(email));
+
+    const data = await sendEmailVerificationService(formData);
     if (data) {
       navigate("/login");
     }
